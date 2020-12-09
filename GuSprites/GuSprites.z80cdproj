@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <CustomProjectExtensionsPath>$(LocalAppData)\CustomProjectSystems\Spect.Net.CodeDiscover\</CustomProjectExtensionsPath>
+    <ProjectGuid>1798be80-d304-4eee-aa78-ad1f5077f0aa</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(CustomProjectExtensionsPath)Spect.Net.CodeDiscover.props" />
+  <ItemGroup>
+    <DisassAnn Include="Annotations.disann" />
+    <SpConf Include="Rom\ZxSpectrum.spconf" />
+    <ProjConf Include="Spectrum.projconf" />
+    <Rom Include="Rom\ZxSpectrum48.rom" />
+    <DisassAnn Include="Rom\ZxSpectrum48.disann" />
+    <Z80Asm Include="Z80CodeFiles\Code.z80asm" />
+    <Z80Asm Include="ZxBasicFiles\TestLib.zxbas.z80asm">
+      <DependentUpon>TestLib.zxbas</DependentUpon>
+    </Z80Asm>
+    <ZxBasic Include="ZxBasicFiles\TestLib.zxbas" />
+    <Z80Test Include="Z80UnitTests\UnitTest.z80test" />
+    <Tzx Include="TapeFiles\Welcome.tzx" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="ZxBasicFiles\GuSprites.zxbas" />
+  </ItemGroup>
+  <Import Project="$(CustomProjectExtensionsPath)Spect.Net.CodeDiscover.targets" />
+</Project>

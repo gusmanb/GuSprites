@@ -1,0 +1,1669 @@
+﻿
+'CONFIG DEFINES
+
+'Total number of 1x1 defined sprites
+#define TOTAL_1x1_SPRITES 2
+'Total number of 1x2 defined sprites
+#define TOTAL_1x2_SPRITES 6
+'Total number of 2x2 defined sprites
+#define TOTAL_2x2_SPRITES 4
+
+'Maximum on-screen 1x1 sprites
+#define ONSCREEN_1x1_SPRITES 2
+'Maximum on-screen 1x2 sprites
+#define ONSCREEN_1x2_SPRITES 3
+'Maximum on-screen 2x2 sprites
+#define ONSCREEN_2x2_SPRITES 2
+
+'If defined enables the tile system in its basic mode (tiles erased when sprite enters on it)
+#define ENABLE_TILES
+'If defined tiles are merged with OR instead of erased
+'Requires ENABLE_TILES
+#define MERGE_TILES
+
+'The lib by default disables interrupts, enabling this option
+'will reactivate them after each call to the lib
+'#define ENABLE_INTERRUPTS
+
+asm
+
+;MACROS
+
+#define READ_HL_POINTER(Hi,Lo) \
+ld Lo, (hl) \
+inc hl \
+ld Hi, (hl) \
+inc hl \
+
+
+#define WRITE_HL_POINTER(Hi, Lo) \
+ld (hl), Lo \
+inc hl \
+ld (hl), Hi \
+inc hl \
+
+
+#define WRITE_16B_ADDRESS(value, target, temp) \
+ld temp, value \
+ld (target), temp \
+
+
+#define EXCHANGE_16B_A(regAH, regAL, regBH, regBL) \
+ld a, regAH \
+ld regAH, regBH \
+ld regBH, a \
+ld a, regAL \
+ld regAL, regBL \
+ld regBL, a \
+
+#define COPY_16B_REG(sourceH, sourceL, destH, destL) \
+ld destH, sourceH \
+ld destL, sourceL \
+
+
+#define ERASE_MEMORY(address, length) \
+ld a, 0 \
+ld de, address \
+ld (de), a \
+inc de \
+ld hl, address \
+ld bc, length - 1 \
+ldir \
+
+
+#define SHIFT_24B(first,second,third) \
+srl first \
+rr second \
+rr third \
+srl first \
+rr second \
+rr third \
+srl first \
+rr second \
+rr third \
+srl first \
+rr second \
+rr third \
+
+
+#define MERGE_CHAR(source, dest) \
+ld a, (source) \
+or (dest) \
+ld (dest),  a \
+inc source \
+inc dest \
+ld a, (source) \
+or (dest) \
+ld (dest),  a \
+inc source \
+inc dest \
+ld a, (source) \
+or (dest) \
+ld (dest),  a \
+inc source \
+inc dest \
+ld a, (source) \
+or (dest) \
+ld (dest),  a \
+inc source \
+inc dest \
+ld a, (source) \
+or (dest) \
+ld (dest),  a \
+inc source \
+inc dest \
+ld a, (source) \
+or (dest) \
+ld (dest),  a \
+inc source \
+inc dest \
+ld a, (source) \
+or (dest) \
+ld (dest),  a \
+inc source \
+inc dest \
+ld a, (source) \
+or (dest) \
+ld (dest),  a \
+
+
+#define HL_POW2_2() \
+add hl, hl \
+add hl, hl \
+
+
+#define HL_POW2_3() \
+add hl, hl \
+add hl, hl \
+add hl, hl \
+
+
+#define HL_POW2_4() \
+add hl, hl \
+add hl, hl \
+add hl, hl \
+add hl, hl \
+
+
+#define HL_POW2_5() \
+add hl, hl \
+add hl, hl \
+add hl, hl \
+add hl, hl \
+add hl, hl \
+
+
+;LIB DEFINES
+#define SPRITE_1x1_BUFFER_SIZE (6 * 8)
+#define SPRITE_1x2_BUFFER_SIZE (9 * 8)
+#define SPRITE_2x2_BUFFER_SIZE (15 * 8)
+
+#define SPRITE_1x1_SHIFTED_SIZE 4
+#define SPRITE_1x2_SHIFTED_SIZE 6
+#define SPRITE_2x2_SHIFTED_SIZE 9
+
+#define TOTAL_1x1_OPS (ONSCREEN_1x1_SPRITES * SPRITE_1x1_SHIFTED_SIZE)
+#define TOTAL_1x2_OPS (ONSCREEN_1x2_SPRITES * SPRITE_1x2_SHIFTED_SIZE)
+#define TOTAL_2x2_OPS (ONSCREEN_2x2_SPRITES * SPRITE_2x2_SHIFTED_SIZE)
+
+#define TOTAL_DRAW_OPS ((TOTAL_1x1_OPS + TOTAL_1x2_OPS + TOTAL_2x2_OPS) * 2)
+
+#ifdef ENABLE_TILES
+#define DRAW_OP_SIZE 5
+#else
+#define DRAW_OP_SIZE 4
+#endif
+
+#define DRAW_OPS_SIZE (TOTAL_DRAW_OPS * DRAW_OP_SIZE)
+#define DRAW_OPS_DATA_SIZE (TOTAL_DRAW_OPS * 8)
+
+#define SPRITE_BUFFER_SIZE ((TOTAL_1x1_SPRITES * SPRITE_1x1_BUFFER_SIZE)+(TOTAL_1x2_SPRITES * SPRITE_1x2_BUFFER_SIZE)+(TOTAL_2x2_SPRITES * SPRITE_2x2_BUFFER_SIZE))
+#define SPRITE_INDEX_SIZE ((TOTAL_1x1_SPRITES + TOTAL_1x2_SPRITES + TOTAL_2x2_SPRITES) * 2)
+
+;JUMP TO PROG START
+jp GSPRITES_LIB_END
+
+;VARIABLES
+
+DRAW_OPS_A:                 ;buffer de operaciones A
+defs DRAW_OPS_SIZE
+
+DRAW_OPS_B:                 ;buffer de operaciones B
+defs DRAW_OPS_SIZE
+
+DRAW_OPS_DATA:              ;buffer de datos de operaciones
+defs DRAW_OPS_DATA_SIZE
+
+CURRENT_DRAW_OPS:           ;puntero a las ops actuales
+defw 0
+CURRENT_CLEAR_OPS:          ;puntero a las ops de limpieza actuales
+defw 0
+
+CURRENT_DRAW_COUNT:         ;cantidad de ops actuales
+defb 0
+CURRENT_CLEAR_COUNT:        ;cantidad de ops de borrado actuales
+defb 0
+
+DRAW_OPS_DATA_INDEX:        ;índice de posición de escritura
+defw 0
+
+CELL_MAP_A:                 ;mapa de celdas A
+defs (32 * 24)
+CELL_MAP_B:                 ;mapa de celdas B
+defs (32 * 24)
+
+CURRENT_DRAW_MAP:           ;puntero a uno de los mapas de celdas que se usa para almacenar las id's de operaciones de dibujado por su posición
+defw 0
+CURRENT_CLEAR_MAP:          ;puntero a uno de los mapas de celdas que se usa para almacenar las id's de operaciones de limpieza por su posición
+defw 0
+
+SPRITE_BUFFER:              ;shifted sprite buffer
+defs SPRITE_BUFFER_SIZE
+SPRITE_INDEX:               ;shifted sprite indexes (stores address of each sprite)
+defs SPRITE_INDEX_SIZE
+SPRITE_COUNT:               ;number of created sprites
+defb 0
+
+#ifndef ENABLE_TILES
+
+EMPTY_CHAR:
+defs 8
+
+#endif
+
+#ifdef ENABLE_TILES
+
+TILE_SET:
+defw 0
+TILE_MAP:
+defs 768
+
+#endif
+
+
+;CODE
+
+PROC 
+INIT_GFX_LIB:                       ;TRASHES: HL
+
+#ifndef ENABLE_INTERRUPTS
+    di
+#endif
+
+WRITE_16B_ADDRESS(DRAW_OPS_A, CURRENT_DRAW_OPS, hl)
+WRITE_16B_ADDRESS(DRAW_OPS_B, CURRENT_CLEAR_OPS, hl)
+
+WRITE_16B_ADDRESS(DRAW_OPS_DATA, DRAW_OPS_DATA_INDEX, hl)
+
+WRITE_16B_ADDRESS(CELL_MAP_A, CURRENT_DRAW_MAP, hl)
+WRITE_16B_ADDRESS(CELL_MAP_B, CURRENT_CLEAR_MAP, hl)
+
+WRITE_16B_ADDRESS(SPRITE_BUFFER, SPRITE_INDEX, hl)
+
+ret
+ENDP
+
+PROC
+RESET_GFX_LIB:                      ;TRASHES: HL, A
+
+WRITE_16B_ADDRESS(DRAW_OPS_A, CURRENT_DRAW_OPS, hl)
+WRITE_16B_ADDRESS(DRAW_OPS_B, CURRENT_CLEAR_OPS, hl)
+
+WRITE_16B_ADDRESS(CELL_MAP_A, CURRENT_DRAW_MAP, hl)
+WRITE_16B_ADDRESS(CELL_MAP_B, CURRENT_CLEAR_MAP, hl)
+
+WRITE_16B_ADDRESS(DRAW_OPS_DATA, DRAW_OPS_DATA_INDEX, hl)
+
+WRITE_16B_ADDRESS(SPRITE_BUFFER, SPRITE_INDEX, hl)
+
+ld a, 0
+ld (CURRENT_DRAW_COUNT), a
+ld (CURRENT_CLEAR_COUNT), a
+
+ERASE_MEMORY(SPRITE_BUFFER, SPRITE_BUFFER_SIZE)
+ERASE_MEMORY(CELL_MAP_A, 768)
+ERASE_MEMORY(CELL_MAP_B, 768)
+ERASE_MEMORY(TILE_MAP, 768)
+
+ret
+ENDP
+
+
+PROC
+LOCAL RENDER_LOOP, END_RENDER, RESTORE_STACK
+RENDER_FRAME:                                         ;TRASHES: BC, DE, HL, A
+
+ei
+halt
+di
+
+
+ld a, (CURRENT_DRAW_COUNT)
+cp 0
+jp z, END_RENDER
+
+ld hl, (CURRENT_DRAW_OPS)
+push hl
+
+RENDER_LOOP:
+
+pop hl                      ;get current op address
+
+READ_HL_POINTER(d,e)    ;get op target
+READ_HL_POINTER(b,c)    ;get op source
+
+#ifdef ENABLE_TILES
+inc hl
+#endif
+
+push hl                     ;store current op address
+
+COPY_16B_REG(b,c, h,l)        ;hl = source, de = target, stack = op address
+
+ld (RESTORE_STACK + 1), sp      ;save stack address
+ld sp, hl                       ;point stack to the op data
+ex de, hl
+
+pop de                      ;extract two bytes of data
+ld (hl), e                  ;load first byte
+inc h                       ;increase target address
+ld (hl), d                  ;load second byte
+inc h                       ;increase target address
+pop de                      ;extract two bytes of data
+ld (hl), e                  ;load first byte
+inc h                       ;increase target address
+ld (hl), d                  ;load second byte
+inc h                       ;increase target address
+pop de                      ;extract two bytes of data
+ld (hl), e                  ;load first byte
+inc h                       ;increase target address
+ld (hl), d                  ;load second byte
+inc h                       ;increase target address
+pop de                          ;extract two bytes of data
+ld (hl), e                      ;load first byte
+inc h                           ;increase target address
+ld (hl), d                      ;load second byte
+
+RESTORE_STACK:
+ld sp, 0                    ;Retore the data stack as we were using it for copy
+
+;more ops left?
+ld hl, CURRENT_DRAW_COUNT
+dec (hl)
+jp nz, RENDER_LOOP
+
+;no, clear stack
+pop bc
+
+
+END_RENDER:
+;frame end, swap data
+
+ld bc, (CURRENT_DRAW_OPS)   ;swap draw and clear op
+ld de, (CURRENT_CLEAR_OPS)
+ld (CURRENT_DRAW_OPS), de
+ld (CURRENT_CLEAR_OPS), bc
+
+ld de, (CURRENT_DRAW_MAP)   ;swap draw and clear maps
+ld bc, (CURRENT_CLEAR_MAP)
+ld (CURRENT_DRAW_MAP), bc
+ld (CURRENT_CLEAR_MAP), de
+
+ld a, 0
+push de                     ;clear map
+ld (de), a
+inc de
+pop hl
+ld bc, 767
+ldir
+
+ld a, (CURRENT_CLEAR_COUNT) ;swap draw count and erase clear count
+ld (CURRENT_DRAW_COUNT), a
+ld a, 0
+ld (CURRENT_CLEAR_COUNT), a
+
+WRITE_16B_ADDRESS(DRAW_OPS_DATA, DRAW_OPS_DATA_INDEX, hl) ; reset op index
+
+ret
+ENDP
+
+
+PROC
+CREATE_SPRITE_BUFFER:          ;input: bc = buffer sze, output: hl = sprite buffer address, trash = bc, de, hl, a
+
+ld a, (SPRITE_COUNT)
+add a, a
+ld e, a
+ld d, 0
+ld hl, SPRITE_INDEX
+add hl, de
+
+READ_HL_POINTER(d,e)         ;load in DE the data address
+                            ;hl = next index, de = data start
+push de
+
+ex de, hl
+add hl, bc
+ex de, hl
+
+WRITE_HL_POINTER(d,e)        ;store in index the next buffer start address
+
+ld hl, SPRITE_COUNT         ;incrementar cuenta de sprites
+inc (hl)
+
+pop hl
+
+ret
+ENDP
+
+
+PROC
+LOCAL LOOP
+CREATE_1x1_SPRITE:          ;input: hl = sprite address, output: a = sprite number (base 1); trash= bc, de, hl, a
+
+push hl
+ld bc, SPRITE_1x1_BUFFER_SIZE
+call CREATE_SPRITE_BUFFER   ;create buffer
+
+ld de, 4
+add hl, de                  ;skip padding bytes
+
+pop de                      ;restore source address and preserve it again
+push de
+
+ex de, hl
+
+ld bc, 8
+ldir                        ;copy the sprite
+
+ld hl, 8                    ;skip bottom padding and upper padding of next column
+add hl, de
+
+ex de, hl
+pop hl                      ;hl = source, de = dest
+
+ld ixh, d                   ;copy dest to ix
+ld ixl, e
+
+ld b, 8
+
+LOOP:
+
+ld e, (hl)              ;load and shift byte to two bytes
+ld d, 0
+inc hl
+ex de, hl
+HL_POW2_4()
+ex de, hl
+
+ld (ix+0), d            ;write both bytes to the sprite
+ld (ix+16), e
+inc ix
+
+djnz LOOP
+
+ld a, (SPRITE_COUNT)      ;read sprite number
+
+ret
+ENDP
+
+
+PROC
+LOCAL LOOP
+CREATE_1x2_SPRITE:
+
+push hl
+ld bc, SPRITE_1x2_BUFFER_SIZE
+call CREATE_SPRITE_BUFFER   ;create buffer
+
+ld de, 4
+add hl, de                  ;skip padding bytes
+
+pop de                      ;restore source address and preserve it again
+push de
+
+ex de, hl
+
+ld bc, 16
+ldir                        ;copy the sprite
+
+ld hl, 8                    ;skip bottom padding and upper padding of next column
+add hl, de
+
+ex de, hl
+pop hl                      ;hl = source, de = dest
+
+ld ixh, d                   ;copy dest to ix
+ld ixl, e
+
+ld b, 16
+
+LOOP:
+
+ld e, (hl)              ;load and shift byte to two bytes
+ld d, 0
+inc hl
+ex de, hl
+HL_POW2_4()
+ex de, hl
+
+ld (ix+0), d            ;write both bytes to the sprite
+ld (ix+24), e
+inc ix
+
+djnz LOOP
+
+ld a, (SPRITE_COUNT)      ;read sprite number
+
+ret
+
+ENDP
+
+PROC
+LOCAL LOOP
+CREATE_2x2_SPRITE:
+
+push hl
+ld bc, SPRITE_2x2_BUFFER_SIZE
+call CREATE_SPRITE_BUFFER   ;create buffer
+
+ld de, 4
+add hl, de                  ;skip padding bytes
+
+pop de                      ;restore source address and preserve it again
+push de
+
+ex de, hl
+ld bc, 16
+ldir                        ;copy the sprite
+
+ex de, hl
+ld bc, 8
+add hl, bc
+
+ex de, hl
+ld bc, 16
+ldir
+
+ld hl, 8                    ;skip bottom padding and upper padding of next column
+add hl, de
+ex de, hl
+
+pop iy                      ;iy = source, hl = dest
+
+ld ixh, d                   ;copy dest to ix
+ld ixl, e
+
+ld b, 16
+
+LOOP:
+
+ld c, (iy+0)              ;load and shift
+ld d, (iy+16)
+ld e, 0
+
+SHIFT_24B(c,d,e)
+
+ld (ix+0), c                ;save shifted sprite
+ld (ix+24), d
+ld (ix+48), e
+
+inc iy                      ;next src/target
+inc ix
+
+djnz LOOP
+
+ld a, (SPRITE_COUNT)      ;read sprite number
+
+ret
+ENDP
+
+PROC
+LOCAL EXISTING_OP, REAL_EXISTING_OP
+CREATE_DRAW_OP:                             ;input: b = xrow, c = ycol, hl=sprite data address. Trashes hl, bc, de, a, ix, iy
+
+;creates a draw op using the char data at de
+
+push hl
+push bc
+
+ld l, c                                     
+ld h, 0
+
+HL_POW2_5()                                  ;ycol * 32
+
+ld c, b                                     ;+ xrow
+ld b, 0
+
+add hl, bc                                  ;hl cointains displacement in map
+
+ld de, (CURRENT_DRAW_MAP)
+
+push hl                                     ;preserve displacement
+
+add hl, de                                  ;advance pointer to concrete cell
+
+ld a, (hl)
+and a
+jp nz, EXISTING_OP                          ;a = num op
+
+ld a, (CURRENT_DRAW_COUNT)                  ;load current draw op count
+inc a                                       ;increase op number
+ld (CURRENT_DRAW_COUNT), a                  ;store it in 
+ld (hl), a
+dec a                                       ;draw count is 1 based, not 0, so decrease 1
+
+ld l, a
+ld h, 0
+
+#ifdef ENABLE_TILES
+
+COPY_16B_REG(h,l, d,e)
+HL_POW2_2()
+add hl, de
+
+#else
+HL_POW2_2()                                   ;hl = offset, a = numop
+#endif
+
+ld bc, (CURRENT_DRAW_OPS)
+add hl, bc                                  ;get current op address
+
+pop de
+pop bc
+push de                                     ;hl = op address, bc = coords, stack = displacement
+
+ld a, c
+and %00011000
+or  %01000000
+ld d, a
+ld a, c
+and %00000111
+rla
+rla
+rla
+rla
+rla
+or b
+ld e, a                                     ;de = screen address
+
+ld ixh, d                                   ;preserve it in iy
+ld ixl, e
+
+WRITE_HL_POINTER(d,e)                        ;store it in op
+
+ld de, (DRAW_OPS_DATA_INDEX)
+
+ld iyh, d                                   ;preserve it in iy
+ld iyl, e
+
+WRITE_HL_POINTER(d,e)                        ;store op data address in op
+
+
+#ifdef ENABLE_TILES
+ld a, 1                                     ;tag this as real op
+ld (hl), a
+#endif
+
+
+ld l, 8                                     ;add 8 bytes of op
+ld h, 0
+add hl, de
+
+ld (DRAW_OPS_DATA_INDEX), hl                ;preserve data index
+
+;now, create the clear op
+
+pop bc
+ld hl, (CURRENT_CLEAR_MAP)
+
+add hl, bc                                  ;advance pointer to concrete cell
+
+ld a, (CURRENT_CLEAR_COUNT)
+inc a
+ld (CURRENT_CLEAR_COUNT), a                 ;update clear count
+ld (hl), a                                  ;store num op in clear map
+dec a                                       ;draw count is 1 based, not 0, so decrease 1
+
+ld l, a                                     ;compute op dispplacement
+ld h, 0
+
+#ifdef ENABLE_TILES
+
+COPY_16B_REG(h,l, d,e)
+HL_POW2_2()                                  ;num * 5
+add hl, de
+
+#else
+
+HL_POW2_2()                                  ; num * 4
+
+#endif
+
+ld de, (CURRENT_CLEAR_OPS)                  ;get op address
+add hl, de
+
+ld d, ixh                                   ;restore screen address from ix
+ld e, ixl
+
+WRITE_HL_POINTER(d,e)                        ;store screen address
+
+#ifdef ENABLE_TILES
+
+ex de, hl                                   ;de contains pointer to op
+ld hl, TILE_MAP                             ;load tile map address
+add hl, bc                                  ;add displacement
+ld a, (hl)
+
+ld l, a
+ld h, 0
+
+HL_POW2_3()
+
+ld bc, (TILE_SET)
+add hl, bc
+ex de, hl
+
+WRITE_HL_POINTER(d,e)                        ;store data address
+
+ld a, 2                                     ;tag this as clear op
+ld (hl), a
+
+#else
+
+
+ld de, EMPTY_CHAR
+WRITE_HL_POINTER(d,e)                        ;store data address
+
+#endif
+
+
+pop hl
+
+
+#ifdef MERGE_TILES
+
+
+ld b, iyh
+ld c, iyl
+;de = tile source, bc = buffer, hl = sprite address
+
+;hl = sprite address, de = buffer address, bc = tile address
+
+ld a, (de)
+    or (hl)
+    ld (bc), a
+    inc bc
+    inc de
+    inc hl
+ld a, (de)
+    or (hl)
+    ld (bc), a
+    inc bc
+    inc de
+    inc hl
+ld a, (de)
+    or (hl)
+    ld (bc), a
+    inc bc
+    inc de
+    inc hl
+ld a, (de)
+    or (hl)
+    ld (bc), a
+    inc bc
+    inc de
+    inc hl
+ld a, (de)
+    or (hl)
+    ld (bc), a
+    inc bc
+    inc de
+    inc hl
+ld a, (de)
+    or (hl)
+    ld (bc), a
+    inc bc
+    inc de
+    inc hl
+ld a, (de)
+    or (hl)
+    ld (bc), a
+    inc bc
+    inc de
+    inc hl
+
+    ld a, (de)
+    or (hl)
+    ld (bc), a
+
+#else
+ld d, iyh                                   ;finally, we copy the char data to the op
+ld e, iyl
+ld bc, 8
+ldir
+#endif
+
+ret 
+
+EXISTING_OP:                                ;a = op number
+
+dec a
+
+ld l, a
+ld h, 0
+
+#ifdef ENABLE_TILES
+
+COPY_16B_REG(h,l, d,e)
+HL_POW2_2()
+add hl, de
+
+#else
+HL_POW2_2()                                   ;hl = offset, a = numop
+#endif
+
+ld bc, (CURRENT_DRAW_OPS)
+
+add hl, bc                                  ;get current op address
+
+READ_HL_POINTER(b,c)                         ;store screen address
+
+push hl                                     ;store op address
+push bc                                     ;store screen address
+
+READ_HL_POINTER(d,e)                         ;de contains the data address
+
+#ifdef ENABLE_TILES
+
+push de                                     ;store tile address
+
+ld a, (hl)
+and 2
+jp z, REAL_EXISTING_OP
+ld a, 1
+ld (hl), a
+#else
+
+ld hl, EMPTY_CHAR
+sbc hl, de                                  ;test if address is the empty char
+jp nz, REAL_EXISTING_OP
+
+#endif
+
+;this was a clear op
+;create the clear op for the new op
+
+;stack contains:
+;screen address
+;op address
+;displacement
+;coordinates
+;sprite address
+
+#ifdef ENABLE_TILES
+pop af
+#endif
+
+pop bc                          ;screen address
+pop de                          ;op address
+pop hl                          ;displacement
+push de
+
+#ifdef ENABLE_TILES
+push af
+#endif
+
+;stack contains:
+;displacement (only if tiles enabled)
+;op address
+;coordinates
+;sprite address
+
+ld de, (CURRENT_CLEAR_MAP)
+add hl, de                      ;add displacement to the map coords
+
+ld a, (CURRENT_CLEAR_COUNT)     ;read current clear count
+inc a                           ;increment it
+ld (hl), a                      ;store it in the map
+ld (CURRENT_CLEAR_COUNT), a     ;update variable
+
+dec a                           ;get clear op address
+ld l, a
+ld h, 0
+
+#ifdef ENABLE_TILES
+
+COPY_16B_REG(h,l, d,e)
+HL_POW2_2()
+add hl, de
+
+#else
+HL_POW2_2()                                   ;hl = offset, a = numop
+#endif
+
+ld de, (CURRENT_CLEAR_OPS)
+add hl, de
+
+WRITE_HL_POINTER(b,c)            ;store screen address
+
+#ifdef ENABLE_TILES
+
+pop de
+WRITE_HL_POINTER(d,e)                        ;store data address
+
+ld a, 2                                     ;tag this as clear op
+ld (hl), a
+
+#else
+
+
+ld de, EMPTY_CHAR
+WRITE_HL_POINTER(d,e)                        ;store data address
+
+#endif
+
+pop hl
+
+#ifdef MERGE_TILES
+push de
+#endif
+
+ld de, (DRAW_OPS_DATA_INDEX)
+
+;push de                                     ;store buffer address
+
+WRITE_HL_POINTER(d,e)                        ;store data address in op
+
+ld hl, 8
+add hl, de
+
+ld (DRAW_OPS_DATA_INDEX), hl                ;increment data index
+
+#ifdef MERGE_TILES
+pop bc                                      ;restore source address
+#endif
+
+pop hl                                      ;clear stack
+pop hl                                      ;copy the data to the op
+
+#ifdef MERGE_TILES
+
+;hl = sprite address, de = buffer address, bc = tile address
+
+ld a, (bc)
+    or (hl)
+    ld (de), a
+    inc bc
+    inc de
+    inc hl
+ld a, (bc)
+    or (hl)
+    ld (de), a
+    inc bc
+    inc de
+    inc hl
+ld a, (bc)
+    or (hl)
+    ld (de), a
+    inc bc
+    inc de
+    inc hl
+ld a, (bc)
+    or (hl)
+    ld (de), a
+    inc bc
+    inc de
+    inc hl
+ld a, (bc)
+    or (hl)
+    ld (de), a
+    inc bc
+    inc de
+    inc hl
+ld a, (bc)
+    or (hl)
+    ld (de), a
+    inc bc
+    inc de
+    inc hl
+ld a, (bc)
+    or (hl)
+    ld (de), a
+    inc bc
+    inc de
+    inc hl
+
+    ld a, (bc)
+    or (hl)
+    ld (de), a
+
+#else
+ld bc, 8
+ldir
+#endif
+
+ret
+
+REAL_EXISTING_OP:                           ;not empty char
+
+pop hl                                      ;clear stack
+pop hl                                      ;clear stack
+pop hl                                      ;clear stack
+pop hl                                      ;clear stack
+
+#ifdef ENABLE_TILES
+pop hl                                      ;clear stack
+#endif
+
+pop hl                                      ;retrieve sprite address
+
+ex de, hl
+
+MERGE_CHAR(de, hl)                          ;merge op
+
+ret
+
+ENDP
+
+
+PROC
+LOCAL LOOP
+DRAW_SPRITE_COLUMN:         ;input: hl = column start address, bc = coordinates, a = column char height
+
+LOOP
+
+push hl
+push bc
+ex af, af'
+
+call CREATE_DRAW_OP
+
+pop bc
+pop hl
+
+inc c
+ld de, 8
+add hl, de
+
+ex af, af'
+
+dec a
+jr nz, LOOP
+
+ret
+ENDP
+
+
+
+PROC
+LOCAL TEST_SHIFTS, HORIZONTAL_SHIFT, VERTICAL_SHIFT
+DRAW_1x1_SPRITE:            ;input: a = sprite number, b=x, c=y
+
+dec a
+add a, a
+ld l, a
+ld h, 0
+ld de, SPRITE_INDEX
+add hl, de
+
+READ_HL_POINTER(d,e)    ;de contains the sprite data
+
+ld a, b
+or c
+and 1
+
+jp nz, TEST_SHIFTS
+
+;unshifted sprite
+srl b                       ;calculate row/col
+srl c
+
+ld hl, 4
+add hl, de                  ;hl = sprite data address
+
+call CREATE_DRAW_OP         ;create op
+
+ret
+
+TEST_SHIFTS:
+ld a, c
+and 1
+jp z, HORIZONTAL_SHIFT
+ld a, b
+and 1
+jp z, VERTICAL_SHIFT
+
+;diagonal shift
+
+srl b                       ;calculate row/col
+srl c
+
+ld hl, 16
+add hl, de
+
+push bc                     ;store coords
+;push hl                     ;store data address
+
+ld a, 2
+call DRAW_SPRITE_COLUMN
+
+ld a,2
+pop bc
+inc b
+call DRAW_SPRITE_COLUMN
+
+ret
+
+HORIZONTAL_SHIFT:
+
+srl b                       ;calculate col/row
+srl c
+
+ld hl, 20                   ;skip 32 bytes; 12 bytes of padding and 1 char
+add hl, de                  ;hl now contains first line of real data
+
+push bc                     ;store coords
+push hl                     ;store data address
+
+call CREATE_DRAW_OP         ;create first op
+
+pop hl
+pop bc                      ;restore col/row
+inc b                       ;next col
+
+
+ld de, 16                   ;skip 16 bytes, 8 bytes of padding and one char
+add hl, de
+
+call CREATE_DRAW_OP         ;create second op
+
+ret
+
+VERTICAL_SHIFT:
+
+srl b                       ;calculate row/col
+srl c
+
+ex de, hl
+ld a, 2
+call DRAW_SPRITE_COLUMN
+
+ret
+ENDP
+
+PROC
+LOCAL TEST_SHIFTS, HORIZONTAL_SHIFT, VERTICAL_SHIFT
+DRAW_1x2_SPRITE:            ;input: a = sprite number, b=x, c=y
+
+dec a
+add a, a
+ld l, a
+ld h, 0
+ld de, SPRITE_INDEX
+add hl, de
+
+READ_HL_POINTER(d,e)    ;de contains the sprite data
+
+ld a, b
+or c
+and 1
+
+jp nz, TEST_SHIFTS
+
+;unshifted sprite
+srl b                       ;calculate row/col
+srl c
+
+ld hl, 4
+add hl, de                  ;hl = sprite data address
+
+ld a, 2
+call DRAW_SPRITE_COLUMN
+
+ret
+
+TEST_SHIFTS:
+ld a, c
+and 1
+jp z, HORIZONTAL_SHIFT
+ld a, b
+and 1
+jp z, VERTICAL_SHIFT
+
+;diagonal shift
+
+srl b                       ;calculate row/col
+srl c
+
+ld hl, 24
+add hl, de
+
+push bc                     ;store coords
+ld a, 3
+call DRAW_SPRITE_COLUMN
+
+ld a,3
+pop bc
+inc b
+call DRAW_SPRITE_COLUMN
+
+ret
+
+HORIZONTAL_SHIFT:
+
+srl b                       ;calculate col/row
+srl c
+
+ld hl, 28                   ;skip 32 bytes; 12 bytes of padding and 1 char
+add hl, de                  ;hl now contains first line of real data
+
+push bc                     ;store coords
+ld a,2
+call DRAW_SPRITE_COLUMN     ;create first column
+
+pop bc                      ;restore col/row
+inc b                       ;next col
+ld de, 8                    ;skip padding
+add hl, de
+ld a, 2
+call DRAW_SPRITE_COLUMN         ;create second op
+
+ret
+
+VERTICAL_SHIFT:
+
+srl b                       ;calculate row/col
+srl c
+
+ex de, hl
+ld a, 3
+call DRAW_SPRITE_COLUMN
+
+ret
+ENDP
+
+PROC
+DRAW_2x2_SPRITE:            ;input: a = sprite number
+
+dec a
+add a, a
+ld l, a
+ld h, 0
+ld de, SPRITE_INDEX
+add hl, de
+
+READ_HL_POINTER(d,e)    ;de contains the sprite data
+
+ld a, b
+or c
+and 1
+
+jp nz, TEST_SHIFTS
+
+;unshifted sprite
+srl b                       ;calculate row/col
+srl c
+
+ld hl, 4
+add hl, de                  ;hl = sprite data address
+
+push bc
+
+ld a, 2
+call DRAW_SPRITE_COLUMN
+
+pop bc
+inc b
+ld de, 8
+add hl, de
+ld a, 2
+call DRAW_SPRITE_COLUMN
+
+ret
+
+TEST_SHIFTS:
+ld a, c
+and 1
+jp z, HORIZONTAL_SHIFT
+ld a, b
+and 1
+jp z, VERTICAL_SHIFT
+
+;diagonal shift
+
+srl b                       ;calculate row/col
+srl c
+
+ld hl, 48
+add hl, de
+
+push bc                     ;store coords
+ld a, 3
+call DRAW_SPRITE_COLUMN     ;draw column
+
+ld a,3                      ;next column
+pop bc
+inc b
+push bc
+call DRAW_SPRITE_COLUMN
+
+ld a,3                      ;last column
+pop bc
+inc b
+call DRAW_SPRITE_COLUMN
+
+ret
+
+HORIZONTAL_SHIFT:
+
+srl b                       ;calculate col/row
+srl c
+
+ld hl, 52                   ;skip 32 bytes; 12 bytes of padding and 1 char
+add hl, de                  ;hl now contains first line of real data
+
+push bc                     ;store coords
+ld a,2                      ;column is 2 chars height
+call DRAW_SPRITE_COLUMN     ;create first column
+
+pop bc                      ;restore col/row
+inc b                       ;next col
+push bc                     ;store for next col
+ld de, 8                    ;skip padding
+add hl, de
+ld a, 2                     
+call DRAW_SPRITE_COLUMN     ;create second column
+
+pop bc                      ;restore col/row
+inc b                       ;next col
+ld de, 8                    ;skip padding
+add hl, de
+ld a, 2
+call DRAW_SPRITE_COLUMN     ;create last column
+
+ret
+
+VERTICAL_SHIFT:
+
+srl b                       ;calculate row/col
+srl c
+
+ex de, hl
+ld a, 3
+push bc
+call DRAW_SPRITE_COLUMN     ;draw first row
+
+ld a, 3
+pop bc
+inc b
+call DRAW_SPRITE_COLUMN     ;draw second row
+
+ret
+ENDP
+
+#ifdef ENABLE_TILES
+PROC
+SET_TILEMAP:            ;input: hl = tile set address, trashes de, hl
+
+ld de, TILE_SET
+ex de, hl
+WRITE_HL_POINTER(d,e)
+
+ret
+ENDP
+
+PROC
+SET_TILE:               ;input: a = tile number, c = color, e = x, l = y, trashes bc, de, hl, a
+
+
+HL_POW2_5()              ;y * 32
+
+add hl, de              ;+ x
+
+ex de, hl
+
+ld hl, TILE_MAP
+add hl, de              ;+ tile_map address
+
+ld (hl), a              ;set tile number
+
+ld hl, $5800
+add hl, de
+ld (hl), c              ;set tile color
+
+
+ld l, a                 ;get tile source address
+ld h, 0
+
+HL_POW2_3()
+
+ld bc, (TILE_SET)
+add hl, bc
+
+
+ld a, d                 ;calculate screen address
+rla
+rla
+rla
+or %01000000
+ld d, a
+
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+
+ld a, (hl)
+ld (de), a
+
+ret
+ENDP
+
+#endif
+
+GSPRITES_LIB_END:
+
+end asm
+
+
+sub InitGFXLib()
+
+asm
+
+#ifdef ENABLE_INTERRUPTS
+    di
+#endif
+    call INIT_GFX_LIB
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+end asm
+
+end sub
+
+sub ResetGFXLib()
+
+asm
+
+#ifdef ENABLE_INTERRUPTS
+    di
+#endif
+    call RESET_GFX_LIB
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+
+end asm
+
+end sub
+
+sub RenderFrame()
+
+asm
+
+    call RENDER_FRAME
+
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+
+end asm
+
+end sub
+
+function fastcall Create1x1Sprite(SpriteAddress as uInteger) as uByte
+
+asm
+
+#ifdef ENABLE_INTERRUPTS
+    di
+#endif
+    push ix
+    call CREATE_1x1_SPRITE
+    pop ix
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+
+end asm
+
+end function
+
+sub fastcall Draw1x1Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
+
+asm
+
+#ifdef ENABLE_INTERRUPTS
+    di
+#endif
+
+    exx
+    pop hl
+    exx
+    pop bc
+    pop de
+    exx
+    push hl
+    exx
+
+    push ix
+
+    ld c, d
+    call DRAW_1x1_SPRITE
+
+    pop ix
+
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+
+end asm
+
+end sub
+
+function fastcall Create1x2Sprite(SpriteAddress as uInteger) as uByte
+
+asm
+
+#ifdef ENABLE_INTERRUPTS
+    di
+#endif
+    push ix
+    call CREATE_1x2_SPRITE
+    pop ix
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+
+end asm
+
+end function
+
+sub fastcall Draw1x2Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
+
+asm
+
+#ifdef ENABLE_INTERRUPTS
+    di
+#endif
+
+    exx
+    pop hl
+    exx
+    pop bc
+    pop de
+    exx
+    push hl
+    exx
+    push ix
+    ld c, d
+    call DRAW_1x2_SPRITE
+    pop ix
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+
+end asm
+
+end sub
+
+function fastcall Create2x2Sprite(SpriteAddress as uInteger) as uByte
+
+asm
+
+#ifdef ENABLE_INTERRUPTS
+    di
+#endif
+    push ix
+    call CREATE_2x2_SPRITE
+    pop ix
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+
+end asm
+
+end function
+
+sub fastcall Draw2x2Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
+
+asm
+
+#ifdef ENABLE_INTERRUPTS
+    di
+#endif
+
+    exx
+    pop hl
+    exx
+    pop bc
+    pop de
+    exx
+    push hl
+    exx
+    push ix
+    ld c, d
+    call DRAW_2x2_SPRITE
+    pop ix
+
+#ifdef ENABLE_INTERRUPTS
+    ei
+#endif
+
+end asm
+
+end sub
+
+#ifdef ENABLE_TILES
+
+sub fastcall SetTileset(TileSet as uInteger)
+
+asm
+    call SET_TILEMAP
+end asm
+
+end sub
+
+sub fastcall SetTile(TileNumber as uByte, Color as uInteger, X as uInteger, Y as uInteger)
+
+asm
+    exx
+    pop hl
+    exx
+    pop bc
+    pop de
+    pop hl
+    exx
+    push hl
+    exx
+    call SET_TILE
+end asm
+
+end sub
+
+#endif

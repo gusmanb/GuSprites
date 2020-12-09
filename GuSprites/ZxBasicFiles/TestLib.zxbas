@@ -1,0 +1,136 @@
+﻿REM @options --asm --array-base 1 --string-base 1 --optimize 4 --org 32768 --heap-size 256 --explicit --strict -D HIDE_LOAD_MSG
+
+#include "GuSprites.zxbas"
+
+border 2
+cls
+
+Dim sprite(8) as uByte => { 64,70,70,64,8,244,2,1 }
+Dim sprite2(16) as uByte => { 20,189,66,74,34,28,8,20, 50,34,70,101,58,18,19,24 }
+Dim sprite3(32) as uByte => { 73,73,73,73,73,73,73,73, 0,0,255,0,0,255,0,0, 73,73,73,73,73,73,73,73, 0,0,255,0,0,255,0,0 }
+
+Dim tileSet(3,8) as uByte => { _ 
+    {0,0,0,0,0,0,0,0}, _
+    { 0,60,66,66,66,66,60,0 }, _
+    { 0,24,24,36,66,66,126,0 } _
+}
+
+Dim sNumber as uByte
+Dim sNumber2 as uByte
+Dim sNumber3 as uByte
+
+InitGFXLib()
+
+SetTileset(@tileSet)
+
+dim x as uByte
+dim y as uByte
+
+for y = 0 to 23
+        
+    if y mod 2 = 0 then
+        for x = 0 to 31 step 2
+            SetTile(1, 52, x, y)
+        next x
+    else
+        for x = 1 to 31 step 2
+            SetTile(2, 56, x, y)
+        next x
+    end if
+
+next y
+
+sNumber = Create1x1Sprite(@sprite)
+sNumber2 = Create1x2Sprite(@sprite2)
+sNumber3 = Create2x2Sprite(@sprite3)
+
+dim xs(12) as uByte
+dim ys(12) as uByte
+dim xss(12) as byte
+dim yss(12) as byte
+dim b as ubyte
+dim c as byte = 1
+xss(1) = 0
+yss(1) = 1
+xss(2) = 0
+yss(2) = -1
+xss(3) = 1
+yss(3) = 0
+xss(4) = -1
+yss(4) = 0
+
+xss(5) = 1
+yss(5) = 1
+xss(6) = -1
+yss(6) = 1
+xss(7) = 1
+yss(7) = -1
+xss(8) = -1
+yss(8) = -1
+xss(9) = 1
+yss(9) = 2
+xss(10) = -1
+yss(10) = -2
+xss(11) = -1
+yss(11) = 2
+xss(12) = 1
+yss(12) = -2
+
+xs(1) = 10
+ys(1) = 10
+xs(2) = 10
+ys(2) = 10
+xs(3) = 10
+ys(3) = 10
+xs(4) = 10
+ys(4) = 10
+xs(5) = 10
+ys(5) = 10
+xs(6) = 10
+ys(6) = 10
+xs(7) = 10
+ys(7) = 10
+xs(8) = 10
+ys(8) = 10
+xs(9) = 10
+ys(9) = 10
+xs(10) = 10
+ys(10) = 10
+xs(11) = 10
+ys(11) = 10
+xs(12) = 10
+ys(12) = 10
+
+do
+
+for b = 0 to 3
+
+    xs(b * 3 + 1) = xs(b * 3 + 1) + xss(b * 3 + 1)
+    ys(b * 3 + 1) = ys(b * 3 + 1) + yss(b * 3 + 1)
+
+    if ys(b * 3 + 1) > 43 or ys(b * 3 + 1) < 1 then yss(b * 3 + 1) = -yss(b * 3 + 1)
+    if xs(b * 3 + 1) > 59 or xs(b * 3 + 1) < 1 then xss(b * 3 + 1) = -xss(b * 3 + 1)
+
+    Draw1x1Sprite(sNumber, xs(b * 3 + 1), ys(b * 3 + 1))
+
+    xs(b * 3 + 2) = xs(b * 3 + 2) + xss(b * 3 + 2)
+    ys(b * 3 + 2) = ys(b * 3 + 2) + yss(b * 3 + 2)
+
+    if ys(b * 3 + 2) > 43 or ys(b * 3 + 2) < 1 then yss(b * 3 + 2) = -yss(b * 3 + 2)
+    if xs(b * 3 + 2) > 59 or xs(b * 3 + 2) < 1 then xss(b * 3 + 2) = -xss(b * 3 + 2)
+
+    Draw1x2Sprite(sNumber2, xs(b * 3 + 2), ys(b * 3 + 2))
+
+    xs(b * 3 + 3) = xs(b * 3 + 3) + xss(b * 3 + 3)
+    ys(b * 3 + 3) = ys(b * 3 + 3) + yss(b * 3 + 3)
+
+    if ys(b * 3 + 3) > 43 or ys(b * 3 + 3) < 1 then yss(b * 3 + 3) = -yss(b * 3 + 3)
+    if xs(b * 3 + 3) > 59 or xs(b * 3 + 3) < 1 then xss(b * 3 + 3) = -xss(b * 3 + 3)
+
+    Draw2x2Sprite(sNumber3, xs(b * 3 + 3), ys(b * 3 + 3))
+
+next b
+
+RenderFrame()
+
+loop

@@ -1,0 +1,2524 @@
+	.zxbasic
+	org 32768
+__START_PROGRAM:
+	di
+	push ix
+	push iy
+	exx
+	push hl
+	exx
+	ld hl, 0
+	add hl, sp
+	ld (__CALL_BACK__), hl
+	ei
+	jp __MAIN_PROGRAM__
+ZXBASIC_USER_DATA:
+	; Defines USER DATA Length in bytes
+ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_END - ZXBASIC_USER_DATA
+	__LABEL__.ZXBASIC_USER_DATA_LEN EQU ZXBASIC_USER_DATA_LEN
+	__LABEL__.ZXBASIC_USER_DATA EQU ZXBASIC_USER_DATA
+_sNumber:
+	DEFB 00
+_sNumber2:
+	DEFB 00
+_sNumber3:
+	DEFB 00
+_x:
+	DEFB 00
+_y:
+	DEFB 00
+_b:
+	DEFB 00
+_sprite:
+	DEFW __LABEL36
+_sprite.__DATA__.__PTR__:
+	DEFW _sprite.__DATA__
+_sprite.__DATA__:
+	DEFB 40h
+	DEFB 46h
+	DEFB 46h
+	DEFB 40h
+	DEFB 08h
+	DEFB 0F4h
+	DEFB 02h
+	DEFB 01h
+__LABEL36:
+	DEFW 0000h
+	DEFB 01h
+_sprite2:
+	DEFW __LABEL37
+_sprite2.__DATA__.__PTR__:
+	DEFW _sprite2.__DATA__
+_sprite2.__DATA__:
+	DEFB 14h
+	DEFB 0BDh
+	DEFB 42h
+	DEFB 4Ah
+	DEFB 22h
+	DEFB 1Ch
+	DEFB 08h
+	DEFB 14h
+	DEFB 32h
+	DEFB 22h
+	DEFB 46h
+	DEFB 65h
+	DEFB 3Ah
+	DEFB 12h
+	DEFB 13h
+	DEFB 18h
+__LABEL37:
+	DEFW 0000h
+	DEFB 01h
+_sprite3:
+	DEFW __LABEL38
+_sprite3.__DATA__.__PTR__:
+	DEFW _sprite3.__DATA__
+_sprite3.__DATA__:
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 00h
+	DEFB 00h
+	DEFB 0FFh
+	DEFB 00h
+	DEFB 00h
+	DEFB 0FFh
+	DEFB 00h
+	DEFB 00h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 49h
+	DEFB 00h
+	DEFB 00h
+	DEFB 0FFh
+	DEFB 00h
+	DEFB 00h
+	DEFB 0FFh
+	DEFB 00h
+	DEFB 00h
+__LABEL38:
+	DEFW 0000h
+	DEFB 01h
+_tileSet:
+	DEFW __LABEL39
+_tileSet.__DATA__.__PTR__:
+	DEFW _tileSet.__DATA__
+_tileSet.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 3Ch
+	DEFB 42h
+	DEFB 42h
+	DEFB 42h
+	DEFB 42h
+	DEFB 3Ch
+	DEFB 00h
+	DEFB 00h
+	DEFB 18h
+	DEFB 18h
+	DEFB 24h
+	DEFB 42h
+	DEFB 42h
+	DEFB 7Eh
+	DEFB 00h
+__LABEL39:
+	DEFW 0001h
+	DEFW 0008h
+	DEFB 01h
+_xs:
+	DEFW __LABEL40
+_xs.__DATA__.__PTR__:
+	DEFW _xs.__DATA__
+_xs.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL40:
+	DEFW 0000h
+	DEFB 01h
+_ys:
+	DEFW __LABEL41
+_ys.__DATA__.__PTR__:
+	DEFW _ys.__DATA__
+_ys.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL41:
+	DEFW 0000h
+	DEFB 01h
+_xss:
+	DEFW __LABEL42
+_xss.__DATA__.__PTR__:
+	DEFW _xss.__DATA__
+_xss.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL42:
+	DEFW 0000h
+	DEFB 01h
+_yss:
+	DEFW __LABEL43
+_yss.__DATA__.__PTR__:
+	DEFW _yss.__DATA__
+_yss.__DATA__:
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+	DEFB 00h
+__LABEL43:
+	DEFW 0000h
+	DEFB 01h
+ZXBASIC_USER_DATA_END:
+__MAIN_PROGRAM__:
+#line 27
+#line 176 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		jp GSPRITES_LIB_END
+DRAW_OPS_A:
+		defs ((((2 * 4) + (3 * 6) + (2 * 9)) * 2) * 5)
+DRAW_OPS_B:
+		defs ((((2 * 4) + (3 * 6) + (2 * 9)) * 2) * 5)
+DRAW_OPS_DATA:
+		defs ((((2 * 4) + (3 * 6) + (2 * 9)) * 2) * 8)
+CURRENT_DRAW_OPS:
+		defw 0
+CURRENT_CLEAR_OPS:
+		defw 0
+CURRENT_DRAW_COUNT:
+		defb 0
+CURRENT_CLEAR_COUNT:
+		defb 0
+DRAW_OPS_DATA_INDEX:
+		defw 0
+CELL_MAP_A:
+		defs (32 * 24)
+CELL_MAP_B:
+		defs (32 * 24)
+CURRENT_DRAW_MAP:
+		defw 0
+CURRENT_CLEAR_MAP:
+		defw 0
+SPRITE_BUFFER:
+		defs ((2 * (6 * 8))+(6 * (9 * 8))+(4 * (15 * 8)))
+SPRITE_INDEX:
+		defs ((2 + 6 + 4) * 2)
+SPRITE_COUNT:
+		defb 0
+#line 233 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+TILE_SET:
+		defw 0
+TILE_MAP:
+		defs 768
+#line 242 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		PROC
+INIT_GFX_LIB:
+		di
+#line 252 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld hl, DRAW_OPS_A
+		ld (CURRENT_DRAW_OPS), hl
+#line 253
+		ld hl, DRAW_OPS_B
+		ld (CURRENT_CLEAR_OPS), hl
+#line 254
+		ld hl, DRAW_OPS_DATA
+		ld (DRAW_OPS_DATA_INDEX), hl
+#line 256
+		ld hl, CELL_MAP_A
+		ld (CURRENT_DRAW_MAP), hl
+#line 258
+		ld hl, CELL_MAP_B
+		ld (CURRENT_CLEAR_MAP), hl
+#line 259
+		ld hl, SPRITE_BUFFER
+		ld (SPRITE_INDEX), hl
+#line 261
+		ret
+		ENDP
+		PROC
+RESET_GFX_LIB:
+		ld hl, DRAW_OPS_A
+		ld (CURRENT_DRAW_OPS), hl
+#line 269
+		ld hl, DRAW_OPS_B
+		ld (CURRENT_CLEAR_OPS), hl
+#line 270
+		ld hl, CELL_MAP_A
+		ld (CURRENT_DRAW_MAP), hl
+#line 272
+		ld hl, CELL_MAP_B
+		ld (CURRENT_CLEAR_MAP), hl
+#line 273
+		ld hl, DRAW_OPS_DATA
+		ld (DRAW_OPS_DATA_INDEX), hl
+#line 275
+		ld hl, SPRITE_BUFFER
+		ld (SPRITE_INDEX), hl
+#line 277
+		ld a, 0
+		ld (CURRENT_DRAW_COUNT), a
+		ld (CURRENT_CLEAR_COUNT), a
+		ld a, 0
+		ld de, SPRITE_BUFFER
+		ld (de), a
+		inc de
+		ld hl, SPRITE_BUFFER
+		ld bc, ((2 * (6 * 8))+(6 * (9 * 8))+(4 * (15 * 8))) - 1
+		ldir
+#line 283
+		ld a, 0
+		ld de, CELL_MAP_A
+		ld (de), a
+		inc de
+		ld hl, CELL_MAP_A
+		ld bc, 768 - 1
+		ldir
+#line 284
+		ld a, 0
+		ld de, CELL_MAP_B
+		ld (de), a
+		inc de
+		ld hl, CELL_MAP_B
+		ld bc, 768 - 1
+		ldir
+#line 285
+		ld a, 0
+		ld de, TILE_MAP
+		ld (de), a
+		inc de
+		ld hl, TILE_MAP
+		ld bc, 768 - 1
+		ldir
+#line 286
+		ret
+		ENDP
+		PROC
+		LOCAL RENDER_LOOP, END_RENDER, RESTORE_STACK
+RENDER_FRAME:
+		ei
+		halt
+		di
+		ld a, (CURRENT_DRAW_COUNT)
+		cp 0
+		jp z, END_RENDER
+		ld hl, (CURRENT_DRAW_OPS)
+		push hl
+RENDER_LOOP:
+		pop hl
+		ld e, (hl)
+		inc hl
+		ld d, (hl)
+		inc hl
+#line 312
+		ld c, (hl)
+		inc hl
+		ld b, (hl)
+		inc hl
+#line 313
+		inc hl
+#line 318 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		push hl
+		ld h, b
+		ld l, c
+#line 321
+		ld (RESTORE_STACK + 1), sp
+		ld sp, hl
+		ex de, hl
+		pop de
+		ld (hl), e
+		inc h
+		ld (hl), d
+		inc h
+		pop de
+		ld (hl), e
+		inc h
+		ld (hl), d
+		inc h
+		pop de
+		ld (hl), e
+		inc h
+		ld (hl), d
+		inc h
+		pop de
+		ld (hl), e
+		inc h
+		ld (hl), d
+RESTORE_STACK:
+		ld sp, 0
+		ld hl, CURRENT_DRAW_COUNT
+		dec (hl)
+		jp nz, RENDER_LOOP
+		pop bc
+END_RENDER:
+		ld bc, (CURRENT_DRAW_OPS)
+		ld de, (CURRENT_CLEAR_OPS)
+		ld (CURRENT_DRAW_OPS), de
+		ld (CURRENT_CLEAR_OPS), bc
+		ld de, (CURRENT_DRAW_MAP)
+		ld bc, (CURRENT_CLEAR_MAP)
+		ld (CURRENT_DRAW_MAP), bc
+		ld (CURRENT_CLEAR_MAP), de
+		ld a, 0
+		push de
+		ld (de), a
+		inc de
+		pop hl
+		ld bc, 767
+		ldir
+		ld a, (CURRENT_CLEAR_COUNT)
+		ld (CURRENT_DRAW_COUNT), a
+		ld a, 0
+		ld (CURRENT_CLEAR_COUNT), a
+		ld hl, DRAW_OPS_DATA
+		ld (DRAW_OPS_DATA_INDEX), hl
+#line 385
+		ret
+		ENDP
+		PROC
+CREATE_SPRITE_BUFFER:
+		ld a, (SPRITE_COUNT)
+		add a, a
+		ld e, a
+		ld d, 0
+		ld hl, SPRITE_INDEX
+		add hl, de
+		ld e, (hl)
+		inc hl
+		ld d, (hl)
+		inc hl
+#line 401
+		push de
+		ex de, hl
+		add hl, bc
+		ex de, hl
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		inc hl
+#line 409
+		ld hl, SPRITE_COUNT
+		inc (hl)
+		pop hl
+		ret
+		ENDP
+		PROC
+		LOCAL LOOP
+CREATE_1x1_SPRITE:
+		push hl
+		ld bc, (6 * 8)
+		call CREATE_SPRITE_BUFFER
+		ld de, 4
+		add hl, de
+		pop de
+		push de
+		ex de, hl
+		ld bc, 8
+		ldir
+		ld hl, 8
+		add hl, de
+		ex de, hl
+		pop hl
+		ld ixh, d
+		ld ixl, e
+		ld b, 8
+LOOP:
+		ld e, (hl)
+		ld d, 0
+		inc hl
+		ex de, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+#line 456
+		ex de, hl
+		ld (ix+0), d
+		ld (ix+16), e
+		inc ix
+		djnz LOOP
+		ld a, (SPRITE_COUNT)
+		ret
+		ENDP
+		PROC
+		LOCAL LOOP
+CREATE_1x2_SPRITE:
+		push hl
+		ld bc, (9 * 8)
+		call CREATE_SPRITE_BUFFER
+		ld de, 4
+		add hl, de
+		pop de
+		push de
+		ex de, hl
+		ld bc, 16
+		ldir
+		ld hl, 8
+		add hl, de
+		ex de, hl
+		pop hl
+		ld ixh, d
+		ld ixl, e
+		ld b, 16
+LOOP:
+		ld e, (hl)
+		ld d, 0
+		inc hl
+		ex de, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+#line 507
+		ex de, hl
+		ld (ix+0), d
+		ld (ix+24), e
+		inc ix
+		djnz LOOP
+		ld a, (SPRITE_COUNT)
+		ret
+		ENDP
+		PROC
+		LOCAL LOOP
+CREATE_2x2_SPRITE:
+		push hl
+		ld bc, (15 * 8)
+		call CREATE_SPRITE_BUFFER
+		ld de, 4
+		add hl, de
+		pop de
+		push de
+		ex de, hl
+		ld bc, 16
+		ldir
+		ex de, hl
+		ld bc, 8
+		add hl, bc
+		ex de, hl
+		ld bc, 16
+		ldir
+		ld hl, 8
+		add hl, de
+		ex de, hl
+		pop iy
+		ld ixh, d
+		ld ixl, e
+		ld b, 16
+LOOP:
+		ld c, (iy+0)
+		ld d, (iy+16)
+		ld e, 0
+		srl c
+		rr d
+		rr e
+		srl c
+		rr d
+		rr e
+		srl c
+		rr d
+		rr e
+		srl c
+		rr d
+		rr e
+#line 565
+		ld (ix+0), c
+		ld (ix+24), d
+		ld (ix+48), e
+		inc iy
+		inc ix
+		djnz LOOP
+		ld a, (SPRITE_COUNT)
+		ret
+		ENDP
+		PROC
+		LOCAL EXISTING_OP, REAL_EXISTING_OP
+CREATE_DRAW_OP:
+		push hl
+		push bc
+		ld l, c
+		ld h, 0
+		add hl, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+#line 593
+		ld c, b
+		ld b, 0
+		add hl, bc
+		ld de, (CURRENT_DRAW_MAP)
+		push hl
+		add hl, de
+		ld a, (hl)
+		and a
+		jp nz, EXISTING_OP
+		ld a, (CURRENT_DRAW_COUNT)
+		inc a
+		ld (CURRENT_DRAW_COUNT), a
+		ld (hl), a
+		dec a
+		ld l, a
+		ld h, 0
+		ld d, h
+		ld e, l
+#line 621
+		add hl, hl
+		add hl, hl
+#line 622
+		add hl, de
+#line 628 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld bc, (CURRENT_DRAW_OPS)
+		add hl, bc
+		pop de
+		pop bc
+		push de
+		ld a, c
+		and %00011000
+		or  %01000000
+		ld d, a
+		ld a, c
+		and %00000111
+		rla
+		rla
+		rla
+		rla
+		rla
+		or b
+		ld e, a
+		ld ixh, d
+		ld ixl, e
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		inc hl
+#line 653
+		ld de, (DRAW_OPS_DATA_INDEX)
+		ld iyh, d
+		ld iyl, e
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		inc hl
+#line 660
+		ld a, 1
+		ld (hl), a
+#line 667 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld l, 8
+		ld h, 0
+		add hl, de
+		ld (DRAW_OPS_DATA_INDEX), hl
+		pop bc
+		ld hl, (CURRENT_CLEAR_MAP)
+		add hl, bc
+		ld a, (CURRENT_CLEAR_COUNT)
+		inc a
+		ld (CURRENT_CLEAR_COUNT), a
+		ld (hl), a
+		dec a
+		ld l, a
+		ld h, 0
+		ld d, h
+		ld e, l
+#line 693
+		add hl, hl
+		add hl, hl
+#line 694
+		add hl, de
+#line 702 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld de, (CURRENT_CLEAR_OPS)
+		add hl, de
+		ld d, ixh
+		ld e, ixl
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		inc hl
+#line 709
+		ex de, hl
+		ld hl, TILE_MAP
+		add hl, bc
+		ld a, (hl)
+		ld l, a
+		ld h, 0
+		add hl, hl
+		add hl, hl
+		add hl, hl
+#line 721
+		ld bc, (TILE_SET)
+		add hl, bc
+		ex de, hl
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		inc hl
+#line 727
+		ld a, 2
+		ld (hl), a
+#line 739 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		pop hl
+		ld b, iyh
+		ld c, iyl
+		ld a, (de)
+		or (hl)
+		ld (bc), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (bc), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (bc), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (bc), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (bc), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (bc), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (bc), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (bc), a
+#line 806 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ret
+EXISTING_OP:
+		dec a
+		ld l, a
+		ld h, 0
+		ld d, h
+		ld e, l
+#line 818
+		add hl, hl
+		add hl, hl
+#line 819
+		add hl, de
+#line 825 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld bc, (CURRENT_DRAW_OPS)
+		add hl, bc
+		ld c, (hl)
+		inc hl
+		ld b, (hl)
+		inc hl
+#line 830
+		push hl
+		push bc
+		ld e, (hl)
+		inc hl
+		ld d, (hl)
+		inc hl
+#line 835
+		push de
+		ld a, (hl)
+		and 2
+		jp z, REAL_EXISTING_OP
+		ld a, 1
+		ld (hl), a
+#line 853 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		pop af
+#line 867 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		pop bc
+		pop de
+		pop hl
+		push de
+		push af
+#line 876 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld de, (CURRENT_CLEAR_MAP)
+		add hl, de
+		ld a, (CURRENT_CLEAR_COUNT)
+		inc a
+		ld (hl), a
+		ld (CURRENT_CLEAR_COUNT), a
+		dec a
+		ld l, a
+		ld h, 0
+		ld d, h
+		ld e, l
+#line 897
+		add hl, hl
+		add hl, hl
+#line 898
+		add hl, de
+#line 904 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld de, (CURRENT_CLEAR_OPS)
+		add hl, de
+		ld (hl), c
+		inc hl
+		ld (hl), b
+		inc hl
+#line 908
+		pop de
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		inc hl
+#line 913
+		ld a, 2
+		ld (hl), a
+#line 925 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		pop hl
+		push de
+#line 931 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld de, (DRAW_OPS_DATA_INDEX)
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		inc hl
+#line 936
+		ld hl, 8
+		add hl, de
+		ld (DRAW_OPS_DATA_INDEX), hl
+		pop bc
+#line 946 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		pop hl
+		pop hl
+		ld a, (bc)
+		or (hl)
+		ld (de), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (bc)
+		or (hl)
+		ld (de), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (bc)
+		or (hl)
+		ld (de), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (bc)
+		or (hl)
+		ld (de), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (bc)
+		or (hl)
+		ld (de), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (bc)
+		or (hl)
+		ld (de), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (bc)
+		or (hl)
+		ld (de), a
+		inc bc
+		inc de
+		inc hl
+		ld a, (bc)
+		or (hl)
+		ld (de), a
+#line 1005 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ret
+REAL_EXISTING_OP:
+		pop hl
+		pop hl
+		pop hl
+		pop hl
+		pop hl
+#line 1018 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		pop hl
+		ex de, hl
+		ld a, (de)
+		or (hl)
+		ld (hl),  a
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (hl),  a
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (hl),  a
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (hl),  a
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (hl),  a
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (hl),  a
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (hl),  a
+		inc de
+		inc hl
+		ld a, (de)
+		or (hl)
+		ld (hl),  a
+#line 1023
+		ret
+		ENDP
+		PROC
+		LOCAL LOOP
+DRAW_SPRITE_COLUMN:
+		LOOP
+		push hl
+		push bc
+		ex af, af'
+		call CREATE_DRAW_OP
+		pop bc
+		pop hl
+		inc c
+		ld de, 8
+		add hl, de
+		ex af, af'
+		dec a
+		jr nz, LOOP
+		ret
+		ENDP
+		PROC
+		LOCAL TEST_SHIFTS, HORIZONTAL_SHIFT, VERTICAL_SHIFT
+DRAW_1x1_SPRITE:
+		dec a
+		add a, a
+		ld l, a
+		ld h, 0
+		ld de, SPRITE_INDEX
+		add hl, de
+		ld e, (hl)
+		inc hl
+		ld d, (hl)
+		inc hl
+#line 1070
+		ld a, b
+		or c
+		and 1
+		jp nz, TEST_SHIFTS
+		srl b
+		srl c
+		ld hl, 4
+		add hl, de
+		call CREATE_DRAW_OP
+		ret
+TEST_SHIFTS:
+		ld a, c
+		and 1
+		jp z, HORIZONTAL_SHIFT
+		ld a, b
+		and 1
+		jp z, VERTICAL_SHIFT
+		srl b
+		srl c
+		ld hl, 16
+		add hl, de
+		push bc
+		ld a, 2
+		call DRAW_SPRITE_COLUMN
+		ld a,2
+		pop bc
+		inc b
+		call DRAW_SPRITE_COLUMN
+		ret
+HORIZONTAL_SHIFT:
+		srl b
+		srl c
+		ld hl, 20
+		add hl, de
+		push bc
+		push hl
+		call CREATE_DRAW_OP
+		pop hl
+		pop bc
+		inc b
+		ld de, 16
+		add hl, de
+		call CREATE_DRAW_OP
+		ret
+VERTICAL_SHIFT:
+		srl b
+		srl c
+		ex de, hl
+		ld a, 2
+		call DRAW_SPRITE_COLUMN
+		ret
+		ENDP
+		PROC
+		LOCAL TEST_SHIFTS, HORIZONTAL_SHIFT, VERTICAL_SHIFT
+DRAW_1x2_SPRITE:
+		dec a
+		add a, a
+		ld l, a
+		ld h, 0
+		ld de, SPRITE_INDEX
+		add hl, de
+		ld e, (hl)
+		inc hl
+		ld d, (hl)
+		inc hl
+#line 1166
+		ld a, b
+		or c
+		and 1
+		jp nz, TEST_SHIFTS
+		srl b
+		srl c
+		ld hl, 4
+		add hl, de
+		ld a, 2
+		call DRAW_SPRITE_COLUMN
+		ret
+TEST_SHIFTS:
+		ld a, c
+		and 1
+		jp z, HORIZONTAL_SHIFT
+		ld a, b
+		and 1
+		jp z, VERTICAL_SHIFT
+		srl b
+		srl c
+		ld hl, 24
+		add hl, de
+		push bc
+		ld a, 3
+		call DRAW_SPRITE_COLUMN
+		ld a,3
+		pop bc
+		inc b
+		call DRAW_SPRITE_COLUMN
+		ret
+HORIZONTAL_SHIFT:
+		srl b
+		srl c
+		ld hl, 28
+		add hl, de
+		push bc
+		ld a,2
+		call DRAW_SPRITE_COLUMN
+		pop bc
+		inc b
+		ld de, 8
+		add hl, de
+		ld a, 2
+		call DRAW_SPRITE_COLUMN
+		ret
+VERTICAL_SHIFT:
+		srl b
+		srl c
+		ex de, hl
+		ld a, 3
+		call DRAW_SPRITE_COLUMN
+		ret
+		ENDP
+		PROC
+DRAW_2x2_SPRITE:
+		dec a
+		add a, a
+		ld l, a
+		ld h, 0
+		ld de, SPRITE_INDEX
+		add hl, de
+		ld e, (hl)
+		inc hl
+		ld d, (hl)
+		inc hl
+#line 1256
+		ld a, b
+		or c
+		and 1
+		jp nz, TEST_SHIFTS
+		srl b
+		srl c
+		ld hl, 4
+		add hl, de
+		push bc
+		ld a, 2
+		call DRAW_SPRITE_COLUMN
+		pop bc
+		inc b
+		ld de, 8
+		add hl, de
+		ld a, 2
+		call DRAW_SPRITE_COLUMN
+		ret
+TEST_SHIFTS:
+		ld a, c
+		and 1
+		jp z, HORIZONTAL_SHIFT
+		ld a, b
+		and 1
+		jp z, VERTICAL_SHIFT
+		srl b
+		srl c
+		ld hl, 48
+		add hl, de
+		push bc
+		ld a, 3
+		call DRAW_SPRITE_COLUMN
+		ld a,3
+		pop bc
+		inc b
+		push bc
+		call DRAW_SPRITE_COLUMN
+		ld a,3
+		pop bc
+		inc b
+		call DRAW_SPRITE_COLUMN
+		ret
+HORIZONTAL_SHIFT:
+		srl b
+		srl c
+		ld hl, 52
+		add hl, de
+		push bc
+		ld a,2
+		call DRAW_SPRITE_COLUMN
+		pop bc
+		inc b
+		push bc
+		ld de, 8
+		add hl, de
+		ld a, 2
+		call DRAW_SPRITE_COLUMN
+		pop bc
+		inc b
+		ld de, 8
+		add hl, de
+		ld a, 2
+		call DRAW_SPRITE_COLUMN
+		ret
+VERTICAL_SHIFT:
+		srl b
+		srl c
+		ex de, hl
+		ld a, 3
+		push bc
+		call DRAW_SPRITE_COLUMN
+		ld a, 3
+		pop bc
+		inc b
+		call DRAW_SPRITE_COLUMN
+		ret
+		ENDP
+		PROC
+SET_TILEMAP:
+		ld de, TILE_SET
+		ex de, hl
+		ld (hl), e
+		inc hl
+		ld (hl), d
+		inc hl
+#line 1371
+		ret
+		ENDP
+		PROC
+SET_TILE:
+		add hl, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+#line 1380
+		add hl, de
+		ex de, hl
+		ld hl, TILE_MAP
+		add hl, de
+		ld (hl), a
+		ld hl, $5800
+		add hl, de
+		ld (hl), c
+		ld l, a
+		ld h, 0
+		add hl, hl
+		add hl, hl
+		add hl, hl
+#line 1399
+		ld bc, (TILE_SET)
+		add hl, bc
+		ld a, d
+		rla
+		rla
+		rla
+		or %01000000
+		ld d, a
+		ld a, (hl)
+		ld (de), a
+		inc hl
+		inc d
+		ld a, (hl)
+		ld (de), a
+		inc hl
+		inc d
+		ld a, (hl)
+		ld (de), a
+		inc hl
+		inc d
+		ld a, (hl)
+		ld (de), a
+		inc hl
+		inc d
+		ld a, (hl)
+		ld (de), a
+		inc hl
+		inc d
+		ld a, (hl)
+		ld (de), a
+		inc hl
+		inc d
+		ld a, (hl)
+		ld (de), a
+		inc hl
+		inc d
+		ld a, (hl)
+		ld (de), a
+		ret
+		ENDP
+#line 1448 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+GSPRITES_LIB_END:
+#line 1061
+	ld a, 2
+	call BORDER
+	call CLS
+	call _InitGFXLib
+	ld hl, _tileSet.__DATA__
+	call _SetTileset
+	xor a
+	ld (_y), a
+	jp __LABEL0
+__LABEL3:
+	ld a, (_y)
+	and 1
+	jp nz, __LABEL5
+	xor a
+	ld (_x), a
+	jp __LABEL7
+__LABEL10:
+	ld a, (_y)
+	ld l, a
+	ld h, 0
+	push hl
+	ld a, (_x)
+	ld l, a
+	push hl
+	ld hl, 52
+	push hl
+	ld a, 1
+	call _SetTile
+	ld a, (_x)
+	add a, 2
+	ld (_x), a
+__LABEL7:
+	ld a, 31
+	ld hl, (_x - 1)
+	cp h
+	jp nc, __LABEL10
+	jp __LABEL6
+__LABEL5:
+	ld a, 1
+	ld (_x), a
+	jp __LABEL12
+__LABEL15:
+	ld a, (_y)
+	ld l, a
+	ld h, 0
+	push hl
+	ld a, (_x)
+	ld l, a
+	push hl
+	ld hl, 56
+	push hl
+	ld a, 2
+	call _SetTile
+	ld a, (_x)
+	add a, 2
+	ld (_x), a
+__LABEL12:
+	ld a, 31
+	ld hl, (_x - 1)
+	cp h
+	jp nc, __LABEL15
+__LABEL6:
+	ld hl, _y
+	inc (hl)
+__LABEL0:
+	ld a, 23
+	ld hl, (_y - 1)
+	cp h
+	jp nc, __LABEL3
+	ld hl, _sprite.__DATA__
+	call _Create1x1Sprite
+	ld (_sNumber), a
+	ld hl, _sprite2.__DATA__
+	call _Create1x2Sprite
+	ld (_sNumber2), a
+	ld hl, _sprite3.__DATA__
+	call _Create2x2Sprite
+	ld (_sNumber3), a
+	xor a
+	ld (_xss.__DATA__ + 0), a
+	ld a, 1
+	ld (_yss.__DATA__ + 0), a
+	xor a
+	ld (_xss.__DATA__ + 1), a
+	ld a, 255
+	ld (_yss.__DATA__ + 1), a
+	ld a, 1
+	ld (_xss.__DATA__ + 2), a
+	xor a
+	ld (_yss.__DATA__ + 2), a
+	ld a, 255
+	ld (_xss.__DATA__ + 3), a
+	xor a
+	ld (_yss.__DATA__ + 3), a
+	ld a, 1
+	ld (_xss.__DATA__ + 4), a
+	ld (_yss.__DATA__ + 4), a
+	ld a, 255
+	ld (_xss.__DATA__ + 5), a
+	ld a, 1
+	ld (_yss.__DATA__ + 5), a
+	ld (_xss.__DATA__ + 6), a
+	ld a, 255
+	ld (_yss.__DATA__ + 6), a
+	ld (_xss.__DATA__ + 7), a
+	ld (_yss.__DATA__ + 7), a
+	ld a, 1
+	ld (_xss.__DATA__ + 8), a
+	ld a, 2
+	ld (_yss.__DATA__ + 8), a
+	ld a, 255
+	ld (_xss.__DATA__ + 9), a
+	ld a, 254
+	ld (_yss.__DATA__ + 9), a
+	ld a, 255
+	ld (_xss.__DATA__ + 10), a
+	ld a, 2
+	ld (_yss.__DATA__ + 10), a
+	ld a, 1
+	ld (_xss.__DATA__ + 11), a
+	ld a, 254
+	ld (_yss.__DATA__ + 11), a
+	ld a, 10
+	ld (_xs.__DATA__ + 0), a
+	ld (_ys.__DATA__ + 0), a
+	ld (_xs.__DATA__ + 1), a
+	ld (_ys.__DATA__ + 1), a
+	ld (_xs.__DATA__ + 2), a
+	ld (_ys.__DATA__ + 2), a
+	ld (_xs.__DATA__ + 3), a
+	ld (_ys.__DATA__ + 3), a
+	ld (_xs.__DATA__ + 4), a
+	ld (_ys.__DATA__ + 4), a
+	ld (_xs.__DATA__ + 5), a
+	ld (_ys.__DATA__ + 5), a
+	ld (_xs.__DATA__ + 6), a
+	ld (_ys.__DATA__ + 6), a
+	ld (_xs.__DATA__ + 7), a
+	ld (_ys.__DATA__ + 7), a
+	ld (_xs.__DATA__ + 8), a
+	ld (_ys.__DATA__ + 8), a
+	ld (_xs.__DATA__ + 9), a
+	ld (_ys.__DATA__ + 9), a
+	ld (_xs.__DATA__ + 10), a
+	ld (_ys.__DATA__ + 10), a
+	ld (_xs.__DATA__ + 11), a
+	ld (_ys.__DATA__ + 11), a
+__LABEL17:
+	xor a
+	ld (_b), a
+	jp __LABEL19
+__LABEL22:
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	pop af
+	add a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	pop af
+	ld (hl), a
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	pop af
+	add a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	pop af
+	ld (hl), a
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, 43
+	cp (hl)
+	sbc a, a
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	pop de
+	ld a, (hl)
+	cp 1
+	sbc a, a
+	or d
+	jp z, __LABEL25
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	ld a, (hl)
+	neg
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	pop af
+	ld (hl), a
+__LABEL25:
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, 59
+	cp (hl)
+	sbc a, a
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	pop de
+	ld a, (hl)
+	cp 1
+	sbc a, a
+	or d
+	jp z, __LABEL27
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	ld a, (hl)
+	neg
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	pop af
+	ld (hl), a
+__LABEL27:
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	inc a
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_sNumber)
+	call _Draw1x1Sprite
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	pop af
+	add a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	pop af
+	ld (hl), a
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	pop af
+	add a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	pop af
+	ld (hl), a
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, 43
+	cp (hl)
+	sbc a, a
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	pop de
+	ld a, (hl)
+	cp 1
+	sbc a, a
+	or d
+	jp z, __LABEL29
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	ld a, (hl)
+	neg
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	pop af
+	ld (hl), a
+__LABEL29:
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, 59
+	cp (hl)
+	sbc a, a
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	pop de
+	ld a, (hl)
+	cp 1
+	sbc a, a
+	or d
+	jp z, __LABEL31
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	ld a, (hl)
+	neg
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	pop af
+	ld (hl), a
+__LABEL31:
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 2
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_sNumber2)
+	call _Draw1x2Sprite
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	pop af
+	add a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	pop af
+	ld (hl), a
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	pop af
+	add a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	pop af
+	ld (hl), a
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, 43
+	cp (hl)
+	sbc a, a
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	pop de
+	ld a, (hl)
+	cp 1
+	sbc a, a
+	or d
+	jp z, __LABEL33
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	ld a, (hl)
+	neg
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _yss
+	call __ARRAY
+	pop af
+	ld (hl), a
+__LABEL33:
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, 59
+	cp (hl)
+	sbc a, a
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	pop de
+	ld a, (hl)
+	cp 1
+	sbc a, a
+	or d
+	jp z, __LABEL35
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	ld a, (hl)
+	neg
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xss
+	call __ARRAY
+	pop af
+	ld (hl), a
+__LABEL35:
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _ys
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_b)
+	ld h, 3
+	call __MUL8_FAST
+	add a, 3
+	ld l, a
+	ld h, 0
+	dec hl
+	push hl
+	ld hl, _xs
+	call __ARRAY
+	ld a, (hl)
+	push af
+	ld a, (_sNumber3)
+	call _Draw2x2Sprite
+	ld hl, _b
+	inc (hl)
+__LABEL19:
+	ld a, 3
+	ld hl, (_b - 1)
+	cp h
+	jp nc, __LABEL22
+	call _RenderFrame
+	jp __LABEL17
+__END_PROGRAM:
+	di
+	ld hl, (__CALL_BACK__)
+	ld sp, hl
+	exx
+	pop hl
+	pop iy
+	pop ix
+	exx
+	ei
+	ret
+__CALL_BACK__:
+	DEFW 0
+_InitGFXLib:
+	push ix
+	ld ix, 0
+	add ix, sp
+#line 1678
+#line 1461 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		call INIT_GFX_LIB
+#line 1465 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1681
+_InitGFXLib__leave:
+	ld sp, ix
+	pop ix
+	ret
+_RenderFrame:
+	push ix
+	ld ix, 0
+	add ix, sp
+#line 1701
+		call RENDER_FRAME
+#line 1494 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1703
+_RenderFrame__leave:
+	ld sp, ix
+	pop ix
+	ret
+_Create1x1Sprite:
+#line 1713
+#line 1506 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		push ix
+		call CREATE_1x1_SPRITE
+		pop ix
+#line 1512 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1718
+_Create1x1Sprite__leave:
+	ret
+_Draw1x1Sprite:
+#line 1727
+#line 1524 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		exx
+		pop hl
+		exx
+		pop bc
+		pop de
+		exx
+		push hl
+		exx
+		push ix
+		ld c, d
+		call DRAW_1x1_SPRITE
+		pop ix
+#line 1544 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1741
+_Draw1x1Sprite__leave:
+	ret
+_Create1x2Sprite:
+#line 1755
+#line 1556 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		push ix
+		call CREATE_1x2_SPRITE
+		pop ix
+#line 1562 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1760
+_Create1x2Sprite__leave:
+	ret
+_Draw1x2Sprite:
+#line 1769
+#line 1574 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		exx
+		pop hl
+		exx
+		pop bc
+		pop de
+		exx
+		push hl
+		exx
+		push ix
+		ld c, d
+		call DRAW_1x2_SPRITE
+		pop ix
+#line 1590 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1783
+_Draw1x2Sprite__leave:
+	ret
+_Create2x2Sprite:
+#line 1793
+#line 1602 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		push ix
+		call CREATE_2x2_SPRITE
+		pop ix
+#line 1608 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1798
+_Create2x2Sprite__leave:
+	ret
+_Draw2x2Sprite:
+#line 1807
+#line 1620 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		exx
+		pop hl
+		exx
+		pop bc
+		pop de
+		exx
+		push hl
+		exx
+		push ix
+		ld c, d
+		call DRAW_2x2_SPRITE
+		pop ix
+#line 1637 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1821
+_Draw2x2Sprite__leave:
+	ret
+_SetTileset:
+#line 1834
+		call SET_TILEMAP
+#line 1835
+_SetTileset__leave:
+	ret
+_SetTile:
+#line 1842
+		exx
+		pop hl
+		exx
+		pop bc
+		pop de
+		pop hl
+		exx
+		push hl
+		exx
+		call SET_TILE
+#line 1852
+_SetTile__leave:
+	ret
+#line 1 "array.asm"
+
+; vim: ts=4:et:sw=4:
+	; Copyleft (K) by Jose M. Rodriguez de la Rosa
+	;  (a.k.a. Boriel)
+;  http://www.boriel.com
+	; -------------------------------------------------------------------
+	; Simple array Index routine
+	; Number of total indexes dimensions - 1 at beginning of memory
+	; HL = Start of array memory (First two bytes contains N-1 dimensions)
+	; Dimension values on the stack, (top of the stack, highest dimension)
+	; E.g. A(2, 4) -> PUSH <4>; PUSH <2>
+
+	; For any array of N dimension A(aN-1, ..., a1, a0)
+	; and dimensions D[bN-1, ..., b1, b0], the offset is calculated as
+	; O = [a0 + b0 * (a1 + b1 * (a2 + ... bN-2(aN-1)))]
+; What I will do here is to calculate the following sequence:
+	; ((aN-1 * bN-2) + aN-2) * bN-3 + ...
+
+
+#line 1 "mul16.asm"
+
+__MUL16:	; Mutiplies HL with the last value stored into de stack
+				; Works for both signed and unsigned
+
+			PROC
+
+			LOCAL __MUL16LOOP
+	        LOCAL __MUL16NOADD
+
+			ex de, hl
+			pop hl		; Return address
+			ex (sp), hl ; CALLEE caller convention
+
+__MUL16_FAST:
+	        ld b, 16
+	        ld a, h
+	        ld c, l
+	        ld hl, 0
+
+__MUL16LOOP:
+	        add hl, hl  ; hl << 1
+	        sla c
+	        rla         ; a,c << 1
+	        jp nc, __MUL16NOADD
+	        add hl, de
+
+__MUL16NOADD:
+	        djnz __MUL16LOOP
+
+			ret	; Result in hl (16 lower bits)
+
+			ENDP
+
+#line 20 "array.asm"
+
+#line 24 "C:/zxbasic/src/arch/zx48k/library-asm/array.asm"
+
+__ARRAY_PTR:   ;; computes an array offset from a pointer
+	    ld c, (hl)
+	    inc hl
+	    ld h, (hl)
+	    ld l, c
+
+__ARRAY:
+		PROC
+
+		LOCAL LOOP
+		LOCAL ARRAY_END
+		LOCAL RET_ADDRESS ; Stores return address
+		LOCAL TMP_ARR_PTR ; Stores pointer temporarily
+
+	    ld e, (hl)
+	    inc hl
+	    ld d, (hl)
+	    inc hl
+	    ld (TMP_ARR_PTR), hl
+	    ex de, hl
+		ex (sp), hl	; Return address in HL, array address in the stack
+		ld (RET_ADDRESS + 1), hl ; Stores it for later
+
+		exx
+		pop hl		; Will use H'L' as the pointer
+		ld c, (hl)	; Loads Number of dimensions from (hl)
+		inc hl
+		ld b, (hl)
+		inc hl		; Ready
+		exx
+
+		ld hl, 0	; HL = Offset "accumulator"
+
+LOOP:
+#line 62 "C:/zxbasic/src/arch/zx48k/library-asm/array.asm"
+		pop bc		; Get next index (Ai) from the stack
+
+#line 72 "C:/zxbasic/src/arch/zx48k/library-asm/array.asm"
+
+		add hl, bc	; Adds current index
+
+		exx			; Checks if B'C' = 0
+		ld a, b		; Which means we must exit (last element is not multiplied by anything)
+		or c
+		jr z, ARRAY_END		; if B'Ci == 0 we are done
+
+		ld e, (hl)			; Loads next dimension into D'E'
+		inc hl
+		ld d, (hl)
+		inc hl
+		push de
+		dec bc				; Decrements loop counter
+		exx
+		pop de				; DE = Max bound Number (i-th dimension)
+
+	    call __FNMUL
+		jp LOOP
+
+ARRAY_END:
+		ld a, (hl)
+		exx
+
+#line 101 "C:/zxbasic/src/arch/zx48k/library-asm/array.asm"
+	    LOCAL ARRAY_SIZE_LOOP
+
+	    ex de, hl
+	    ld hl, 0
+	    ld b, a
+ARRAY_SIZE_LOOP:
+	    add hl, de
+	    djnz ARRAY_SIZE_LOOP
+
+#line 111 "C:/zxbasic/src/arch/zx48k/library-asm/array.asm"
+
+	    ex de, hl
+		ld hl, (TMP_ARR_PTR)
+		ld a, (hl)
+		inc hl
+		ld h, (hl)
+		ld l, a
+		add hl, de  ; Adds element start
+
+RET_ADDRESS:
+		jp 0
+
+	    ;; Performs a faster multiply for little 16bit numbs
+	    LOCAL __FNMUL, __FNMUL2
+
+__FNMUL:
+	    xor a
+	    or h
+	    jp nz, __MUL16_FAST
+	    or l
+	    ret z
+
+	    cp 33
+	    jp nc, __MUL16_FAST
+
+	    ld b, l
+	    ld l, h  ; HL = 0
+
+__FNMUL2:
+	    add hl, de
+	    djnz __FNMUL2
+	    ret
+
+TMP_ARR_PTR:
+	    DW 0  ; temporary storage for pointer to tables
+
+		ENDP
+
+#line 1981 "TestLib.zxbas"
+#line 1 "border.asm"
+
+	; __FASTCALL__ Routine to change de border
+	; Parameter (color) specified in A register
+
+	BORDER EQU 229Bh
+
+	; Nothing to do! (Directly from the ZX Spectrum ROM)
+
+#line 1982 "TestLib.zxbas"
+#line 1 "cls.asm"
+
+	; JUMPS directly to spectrum CLS
+	; This routine does not clear lower screen
+
+	;CLS	EQU	0DAFh
+
+	; Our faster implementation
+
+#line 1 "sposn.asm"
+
+	; Printing positioning library.
+			PROC
+			LOCAL ECHO_E
+
+__LOAD_S_POSN:		; Loads into DE current ROW, COL print position from S_POSN mem var.
+			ld de, (S_POSN)
+			ld hl, (MAXX)
+			or a
+			sbc hl, de
+			ex de, hl
+			ret
+
+
+__SAVE_S_POSN:		; Saves ROW, COL from DE into S_POSN mem var.
+			ld hl, (MAXX)
+			or a
+			sbc hl, de
+			ld (S_POSN), hl ; saves it again
+			ret
+
+
+	ECHO_E	EQU 23682
+	MAXX	EQU ECHO_E   ; Max X position + 1
+	MAXY	EQU MAXX + 1 ; Max Y position + 1
+
+	S_POSN	EQU 23688
+	POSX	EQU S_POSN		; Current POS X
+	POSY	EQU S_POSN + 1	; Current POS Y
+
+			ENDP
+
+#line 9 "cls.asm"
+
+CLS:
+		PROC
+
+		LOCAL COORDS
+		LOCAL __CLS_SCR
+		LOCAL ATTR_P
+		LOCAL SCREEN
+
+		ld hl, 0
+		ld (COORDS), hl
+	    ld hl, 1821h
+		ld (S_POSN), hl
+__CLS_SCR:
+		ld hl, SCREEN
+		ld (hl), 0
+		ld d, h
+		ld e, l
+		inc de
+		ld bc, 6144
+		ldir
+
+		; Now clear attributes
+
+		ld a, (ATTR_P)
+		ld (hl), a
+		ld bc, 767
+		ldir
+		ret
+
+	COORDS	EQU	23677
+	SCREEN	EQU 16384 ; Default start of the screen (can be changed)
+	ATTR_P	EQU 23693
+	;you can poke (SCREEN_SCRADDR) to change CLS, DRAW & PRINTing address
+
+	SCREEN_ADDR EQU (__CLS_SCR + 1) ; Address used by print and other screen routines
+								    ; to get the start of the screen
+		ENDP
+
+#line 1983 "TestLib.zxbas"
+#line 1 "mul8.asm"
+
+__MUL8:		; Performs 8bit x 8bit multiplication
+		PROC
+
+		;LOCAL __MUL8A
+		LOCAL __MUL8LOOP
+		LOCAL __MUL8B
+				; 1st operand (byte) in A, 2nd operand into the stack (AF)
+		pop hl	; return address
+		ex (sp), hl ; CALLE convention
+
+;;__MUL8_FAST: ; __FASTCALL__ entry
+	;;	ld e, a
+	;;	ld d, 0
+	;;	ld l, d
+	;;
+	;;	sla h
+	;;	jr nc, __MUL8A
+	;;	ld l, e
+	;;
+;;__MUL8A:
+	;;
+	;;	ld b, 7
+;;__MUL8LOOP:
+	;;	add hl, hl
+	;;	jr nc, __MUL8B
+	;;
+	;;	add hl, de
+	;;
+;;__MUL8B:
+	;;	djnz __MUL8LOOP
+	;;
+	;;	ld a, l ; result = A and HL  (Truncate to lower 8 bits)
+
+__MUL8_FAST: ; __FASTCALL__ entry, a = a * h (8 bit mul) and Carry
+
+	    ld b, 8
+	    ld l, a
+	    xor a
+
+__MUL8LOOP:
+	    add a, a ; a *= 2
+	    sla l
+	    jp nc, __MUL8B
+	    add a, h
+
+__MUL8B:
+	    djnz __MUL8LOOP
+
+		ret		; result = HL
+		ENDP
+
+#line 1984 "TestLib.zxbas"
+
+	END
