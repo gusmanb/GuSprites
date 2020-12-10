@@ -2,18 +2,18 @@
 'CONFIG DEFINES
 
 'Total number of 1x1 defined sprites
-#define TOTAL_1x1_SPRITES 2
+#define TOTAL_1x1_SPRITES 4
 'Total number of 1x2 defined sprites
-#define TOTAL_1x2_SPRITES 6
+#define TOTAL_1x2_SPRITES 8
 'Total number of 2x2 defined sprites
 #define TOTAL_2x2_SPRITES 4
 
 'Maximum on-screen 1x1 sprites
-#define ONSCREEN_1x1_SPRITES 2
+#define ONSCREEN_1x1_SPRITES 4
 'Maximum on-screen 1x2 sprites
-#define ONSCREEN_1x2_SPRITES 3
+#define ONSCREEN_1x2_SPRITES 4
 'Maximum on-screen 2x2 sprites
-#define ONSCREEN_2x2_SPRITES 2
+#define ONSCREEN_2x2_SPRITES 4
 
 'If defined enables the tile system in its basic mode (tiles erased when sprite enters on it)
 #define ENABLE_TILES
@@ -62,7 +62,7 @@ ld destL, sourceL \
 
 
 #define ERASE_MEMORY(address, length) \
-ld a, 0 \
+xor a \
 ld de, address \
 ld (de), a \
 inc de \
@@ -151,6 +151,16 @@ add hl, hl \
 add hl, hl \
 add hl, hl \
 add hl, hl \
+
+#define LDI_8() \
+ldi \
+ldi \
+ldi \
+ldi \
+ldi \
+ldi \
+ldi \
+ldi \
 
 
 ;LIB DEFINES
@@ -276,14 +286,13 @@ WRITE_16B_ADDRESS(DRAW_OPS_DATA, DRAW_OPS_DATA_INDEX, hl)
 
 WRITE_16B_ADDRESS(SPRITE_BUFFER, SPRITE_INDEX, hl)
 
-ld a, 0
+xor a
 ld (CURRENT_DRAW_COUNT), a
 ld (CURRENT_CLEAR_COUNT), a
 
 ERASE_MEMORY(SPRITE_BUFFER, SPRITE_BUFFER_SIZE)
 ERASE_MEMORY(CELL_MAP_A, 768)
 ERASE_MEMORY(CELL_MAP_B, 768)
-ERASE_MEMORY(TILE_MAP, 768)
 
 ret
 ENDP
@@ -369,7 +378,7 @@ ld bc, (CURRENT_CLEAR_MAP)
 ld (CURRENT_DRAW_MAP), bc
 ld (CURRENT_CLEAR_MAP), de
 
-ld a, 0
+xor a
 push de                     ;clear map
 ld (de), a
 inc de
@@ -379,7 +388,7 @@ ldir
 
 ld a, (CURRENT_CLEAR_COUNT) ;swap draw count and erase clear count
 ld (CURRENT_DRAW_COUNT), a
-ld a, 0
+xor a
 ld (CURRENT_CLEAR_COUNT), a
 
 WRITE_16B_ADDRESS(DRAW_OPS_DATA, DRAW_OPS_DATA_INDEX, hl) ; reset op index
@@ -433,8 +442,9 @@ push de
 
 ex de, hl
 
-ld bc, 8
-ldir                        ;copy the sprite
+LDI_8()
+;ld bc, 8
+;ldir                        ;copy the sprite
 
 ld hl, 8                    ;skip bottom padding and upper padding of next column
 add hl, de
@@ -484,8 +494,11 @@ push de
 
 ex de, hl
 
-ld bc, 16
-ldir                        ;copy the sprite
+LDI_8()
+LDI_8()
+
+;ld bc, 16
+;ldir                        ;copy the sprite
 
 ld hl, 8                    ;skip bottom padding and upper padding of next column
 add hl, de
@@ -534,16 +547,22 @@ pop de                      ;restore source address and preserve it again
 push de
 
 ex de, hl
-ld bc, 16
-ldir                        ;copy the sprite
+
+LDI_8()
+LDI_8()
+;ld bc, 16
+;ldir                        ;copy the sprite
 
 ex de, hl
 ld bc, 8
 add hl, bc
 
 ex de, hl
-ld bc, 16
-ldir
+
+LDI_8()
+LDI_8()
+;ld bc, 16
+;ldir
 
 ld hl, 8                    ;skip bottom padding and upper padding of next column
 add hl, de
@@ -661,8 +680,8 @@ WRITE_HL_POINTER(d,e)                        ;store op data address in op
 
 
 #ifdef ENABLE_TILES
-ld a, 1                                     ;tag this as real op
-ld (hl), a
+;ld a, 1                                     ;tag this as real op
+ld (hl), 1
 #endif
 
 
@@ -726,8 +745,8 @@ ex de, hl
 
 WRITE_HL_POINTER(d,e)                        ;store data address
 
-ld a, 2                                     ;tag this as clear op
-ld (hl), a
+;ld a, 2                                     ;tag this as clear op
+ld (hl), 2
 
 #else
 
@@ -800,8 +819,10 @@ ld a, (de)
 #else
 ld d, iyh                                   ;finally, we copy the char data to the op
 ld e, iyl
-ld bc, 8
-ldir
+
+LDI_8()
+;ld bc, 8
+;ldir
 #endif
 
 ret 
@@ -841,8 +862,8 @@ push de                                     ;store tile address
 ld a, (hl)
 and 2
 jp z, REAL_EXISTING_OP
-ld a, 1
-ld (hl), a
+;ld a, 1
+ld (hl), 1
 #else
 
 ld hl, EMPTY_CHAR
@@ -912,8 +933,8 @@ WRITE_HL_POINTER(b,c)            ;store screen address
 pop de
 WRITE_HL_POINTER(d,e)                        ;store data address
 
-ld a, 2                                     ;tag this as clear op
-ld (hl), a
+;ld a, 2                                     ;tag this as clear op
+ld (hl), 2
 
 #else
 
@@ -999,8 +1020,9 @@ ld a, (bc)
     ld (de), a
 
 #else
-ld bc, 8
-ldir
+LDI_8()
+;ld bc, 8
+;ldir
 #endif
 
 ret
