@@ -224,15 +224,30 @@ __LABEL43:
 	DEFB 01h
 ZXBASIC_USER_DATA_END:
 __MAIN_PROGRAM__:
-#line 27
-#line 176 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 28
+		SPRITE_1x1_BUFFER_SIZE equ (6 * 8)
+		SPRITE_1x2_BUFFER_SIZE equ (9 * 8)
+		SPRITE_2x2_BUFFER_SIZE equ (15 * 8)
+		SPRITE_1x1_SHIFTED_SIZE equ 4
+		SPRITE_1x2_SHIFTED_SIZE equ 6
+		SPRITE_2x2_SHIFTED_SIZE equ 9
+		TOTAL_1x1_OPS equ (4 * SPRITE_1x1_SHIFTED_SIZE)
+		TOTAL_1x2_OPS equ (4 * SPRITE_1x2_SHIFTED_SIZE)
+		TOTAL_2x2_OPS equ (4 * SPRITE_2x2_SHIFTED_SIZE)
+		TOTAL_DRAW_OPS equ ((TOTAL_1x1_OPS + TOTAL_1x2_OPS + TOTAL_2x2_OPS) * 2)
+		DRAW_OP_SIZE equ 5
+#line 187 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		DRAW_OPS_SIZE equ (TOTAL_DRAW_OPS * DRAW_OP_SIZE)
+		DRAW_OPS_DATA_SIZE equ (TOTAL_DRAW_OPS * 8)
+		SPRITE_BUFFER_SIZE equ ((4 * SPRITE_1x1_BUFFER_SIZE)+(8 * SPRITE_1x2_BUFFER_SIZE)+(4 * SPRITE_2x2_BUFFER_SIZE))
+		SPRITE_INDEX_SIZE equ ((4 + 8 + 4) * 2)
 		jp GSPRITES_LIB_END
 DRAW_OPS_A:
-		defs ((((2 * 4) + (3 * 6) + (2 * 9)) * 2) * 5)
+		defs DRAW_OPS_SIZE
 DRAW_OPS_B:
-		defs ((((2 * 4) + (3 * 6) + (2 * 9)) * 2) * 5)
+		defs DRAW_OPS_SIZE
 DRAW_OPS_DATA:
-		defs ((((2 * 4) + (3 * 6) + (2 * 9)) * 2) * 8)
+		defs DRAW_OPS_DATA_SIZE
 CURRENT_DRAW_OPS:
 		defw 0
 CURRENT_CLEAR_OPS:
@@ -252,104 +267,95 @@ CURRENT_DRAW_MAP:
 CURRENT_CLEAR_MAP:
 		defw 0
 SPRITE_BUFFER:
-		defs ((2 * (6 * 8))+(6 * (9 * 8))+(4 * (15 * 8)))
+		defs SPRITE_BUFFER_SIZE
 SPRITE_INDEX:
-		defs ((2 + 6 + 4) * 2)
+		defs SPRITE_INDEX_SIZE
 SPRITE_COUNT:
 		defb 0
-#line 233 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 244 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 TILE_SET:
 		defw 0
 TILE_MAP:
 		defs 768
-#line 242 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 253 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		PROC
 INIT_GFX_LIB:
-		di
-#line 252 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 263 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld hl, DRAW_OPS_A
 		ld (CURRENT_DRAW_OPS), hl
-#line 253
+#line 264
 		ld hl, DRAW_OPS_B
 		ld (CURRENT_CLEAR_OPS), hl
-#line 254
+#line 265
 		ld hl, DRAW_OPS_DATA
 		ld (DRAW_OPS_DATA_INDEX), hl
-#line 256
+#line 267
 		ld hl, CELL_MAP_A
 		ld (CURRENT_DRAW_MAP), hl
-#line 258
+#line 269
 		ld hl, CELL_MAP_B
 		ld (CURRENT_CLEAR_MAP), hl
-#line 259
+#line 270
 		ld hl, SPRITE_BUFFER
 		ld (SPRITE_INDEX), hl
-#line 261
+#line 272
 		ret
 		ENDP
 		PROC
 RESET_GFX_LIB:
 		ld hl, DRAW_OPS_A
 		ld (CURRENT_DRAW_OPS), hl
-#line 269
+#line 280
 		ld hl, DRAW_OPS_B
 		ld (CURRENT_CLEAR_OPS), hl
-#line 270
+#line 281
 		ld hl, CELL_MAP_A
 		ld (CURRENT_DRAW_MAP), hl
-#line 272
+#line 283
 		ld hl, CELL_MAP_B
 		ld (CURRENT_CLEAR_MAP), hl
-#line 273
+#line 284
 		ld hl, DRAW_OPS_DATA
 		ld (DRAW_OPS_DATA_INDEX), hl
-#line 275
+#line 286
 		ld hl, SPRITE_BUFFER
 		ld (SPRITE_INDEX), hl
-#line 277
-		ld a, 0
+#line 288
+		xor a
 		ld (CURRENT_DRAW_COUNT), a
 		ld (CURRENT_CLEAR_COUNT), a
-		ld a, 0
+		xor a
 		ld de, SPRITE_BUFFER
 		ld (de), a
 		inc de
 		ld hl, SPRITE_BUFFER
-		ld bc, ((2 * (6 * 8))+(6 * (9 * 8))+(4 * (15 * 8))) - 1
+		ld bc, SPRITE_BUFFER_SIZE - 1
 		ldir
-#line 283
-		ld a, 0
+#line 294
+		xor a
 		ld de, CELL_MAP_A
 		ld (de), a
 		inc de
 		ld hl, CELL_MAP_A
 		ld bc, 768 - 1
 		ldir
-#line 284
-		ld a, 0
+#line 295
+		xor a
 		ld de, CELL_MAP_B
 		ld (de), a
 		inc de
 		ld hl, CELL_MAP_B
 		ld bc, 768 - 1
 		ldir
-#line 285
-		ld a, 0
-		ld de, TILE_MAP
-		ld (de), a
-		inc de
-		ld hl, TILE_MAP
-		ld bc, 768 - 1
-		ldir
-#line 286
+#line 296
 		ret
 		ENDP
 		PROC
 		LOCAL RENDER_LOOP, END_RENDER, RESTORE_STACK
 RENDER_FRAME:
-		ei
+#line 309 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		halt
-		di
+#line 313 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld a, (CURRENT_DRAW_COUNT)
 		cp 0
 		jp z, END_RENDER
@@ -361,18 +367,18 @@ RENDER_LOOP:
 		inc hl
 		ld d, (hl)
 		inc hl
-#line 312
+#line 326
 		ld c, (hl)
 		inc hl
 		ld b, (hl)
 		inc hl
-#line 313
+#line 327
 		inc hl
-#line 318 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 332 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		push hl
 		ld h, b
 		ld l, c
-#line 321
+#line 335
 		ld (RESTORE_STACK + 1), sp
 		ld sp, hl
 		ex de, hl
@@ -410,7 +416,7 @@ END_RENDER:
 		ld bc, (CURRENT_CLEAR_MAP)
 		ld (CURRENT_DRAW_MAP), bc
 		ld (CURRENT_CLEAR_MAP), de
-		ld a, 0
+		xor a
 		push de
 		ld (de), a
 		inc de
@@ -419,11 +425,11 @@ END_RENDER:
 		ldir
 		ld a, (CURRENT_CLEAR_COUNT)
 		ld (CURRENT_DRAW_COUNT), a
-		ld a, 0
+		xor a
 		ld (CURRENT_CLEAR_COUNT), a
 		ld hl, DRAW_OPS_DATA
 		ld (DRAW_OPS_DATA_INDEX), hl
-#line 385
+#line 399
 		ret
 		ENDP
 		PROC
@@ -438,7 +444,7 @@ CREATE_SPRITE_BUFFER:
 		inc hl
 		ld d, (hl)
 		inc hl
-#line 401
+#line 415
 		push de
 		ex de, hl
 		add hl, bc
@@ -447,7 +453,7 @@ CREATE_SPRITE_BUFFER:
 		inc hl
 		ld (hl), d
 		inc hl
-#line 409
+#line 423
 		ld hl, SPRITE_COUNT
 		inc (hl)
 		pop hl
@@ -457,15 +463,22 @@ CREATE_SPRITE_BUFFER:
 		LOCAL LOOP
 CREATE_1x1_SPRITE:
 		push hl
-		ld bc, (6 * 8)
+		ld bc, SPRITE_1x1_BUFFER_SIZE
 		call CREATE_SPRITE_BUFFER
 		ld de, 4
 		add hl, de
 		pop de
 		push de
 		ex de, hl
-		ld bc, 8
-		ldir
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+#line 450
 		ld hl, 8
 		add hl, de
 		ex de, hl
@@ -482,7 +495,7 @@ LOOP:
 		add hl, hl
 		add hl, hl
 		add hl, hl
-#line 456
+#line 471
 		ex de, hl
 		ld (ix+0), d
 		ld (ix+16), e
@@ -495,15 +508,31 @@ LOOP:
 		LOCAL LOOP
 CREATE_1x2_SPRITE:
 		push hl
-		ld bc, (9 * 8)
+		ld bc, SPRITE_1x2_BUFFER_SIZE
 		call CREATE_SPRITE_BUFFER
 		ld de, 4
 		add hl, de
 		pop de
 		push de
 		ex de, hl
-		ld bc, 16
-		ldir
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+#line 502
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+#line 503
 		ld hl, 8
 		add hl, de
 		ex de, hl
@@ -520,7 +549,7 @@ LOOP:
 		add hl, hl
 		add hl, hl
 		add hl, hl
-#line 507
+#line 525
 		ex de, hl
 		ld (ix+0), d
 		ld (ix+24), e
@@ -533,21 +562,53 @@ LOOP:
 		LOCAL LOOP
 CREATE_2x2_SPRITE:
 		push hl
-		ld bc, (15 * 8)
+		ld bc, SPRITE_2x2_BUFFER_SIZE
 		call CREATE_SPRITE_BUFFER
 		ld de, 4
 		add hl, de
 		pop de
 		push de
 		ex de, hl
-		ld bc, 16
-		ldir
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+#line 556
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+#line 557
 		ex de, hl
 		ld bc, 8
 		add hl, bc
 		ex de, hl
-		ld bc, 16
-		ldir
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+#line 567
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+		ldi
+#line 568
 		ld hl, 8
 		add hl, de
 		ex de, hl
@@ -571,7 +632,7 @@ LOOP:
 		srl c
 		rr d
 		rr e
-#line 565
+#line 589
 		ld (ix+0), c
 		ld (ix+24), d
 		ld (ix+48), e
@@ -593,7 +654,7 @@ CREATE_DRAW_OP:
 		add hl, hl
 		add hl, hl
 		add hl, hl
-#line 593
+#line 617
 		ld c, b
 		ld b, 0
 		add hl, bc
@@ -612,12 +673,12 @@ CREATE_DRAW_OP:
 		ld h, 0
 		ld d, h
 		ld e, l
-#line 621
+#line 645
 		add hl, hl
 		add hl, hl
-#line 622
+#line 646
 		add hl, de
-#line 628 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 652 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld bc, (CURRENT_DRAW_OPS)
 		add hl, bc
 		pop de
@@ -642,7 +703,7 @@ CREATE_DRAW_OP:
 		inc hl
 		ld (hl), d
 		inc hl
-#line 653
+#line 677
 		ld de, (DRAW_OPS_DATA_INDEX)
 		ld iyh, d
 		ld iyl, e
@@ -650,10 +711,9 @@ CREATE_DRAW_OP:
 		inc hl
 		ld (hl), d
 		inc hl
-#line 660
-		ld a, 1
-		ld (hl), a
-#line 667 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 684
+		ld (hl), 1
+#line 691 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld l, 8
 		ld h, 0
 		add hl, de
@@ -670,12 +730,12 @@ CREATE_DRAW_OP:
 		ld h, 0
 		ld d, h
 		ld e, l
-#line 693
+#line 716
 		add hl, hl
 		add hl, hl
-#line 694
+#line 717
 		add hl, de
-#line 702 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 725 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld de, (CURRENT_CLEAR_OPS)
 		add hl, de
 		ld d, ixh
@@ -684,7 +744,7 @@ CREATE_DRAW_OP:
 		inc hl
 		ld (hl), d
 		inc hl
-#line 709
+#line 732
 		ex de, hl
 		ld hl, TILE_MAP
 		add hl, bc
@@ -694,7 +754,7 @@ CREATE_DRAW_OP:
 		add hl, hl
 		add hl, hl
 		add hl, hl
-#line 721
+#line 744
 		ld bc, (TILE_SET)
 		add hl, bc
 		ex de, hl
@@ -702,10 +762,9 @@ CREATE_DRAW_OP:
 		inc hl
 		ld (hl), d
 		inc hl
-#line 727
-		ld a, 2
-		ld (hl), a
-#line 739 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 750
+		ld (hl), 2
+#line 762 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		pop hl
 		ld b, iyh
 		ld c, iyl
@@ -754,7 +813,7 @@ CREATE_DRAW_OP:
 		ld a, (de)
 		or (hl)
 		ld (bc), a
-#line 806 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 831 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ret
 EXISTING_OP:
 		dec a
@@ -762,41 +821,40 @@ EXISTING_OP:
 		ld h, 0
 		ld d, h
 		ld e, l
-#line 818
+#line 843
 		add hl, hl
 		add hl, hl
-#line 819
+#line 844
 		add hl, de
-#line 825 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 850 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld bc, (CURRENT_DRAW_OPS)
 		add hl, bc
 		ld c, (hl)
 		inc hl
 		ld b, (hl)
 		inc hl
-#line 830
+#line 855
 		push hl
 		push bc
 		ld e, (hl)
 		inc hl
 		ld d, (hl)
 		inc hl
-#line 835
+#line 860
 		push de
 		ld a, (hl)
 		and 2
 		jp z, REAL_EXISTING_OP
-		ld a, 1
-		ld (hl), a
-#line 853 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		ld (hl), 1
+#line 878 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		pop af
-#line 867 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 892 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		pop bc
 		pop de
 		pop hl
 		push de
 		push af
-#line 876 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 901 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld de, (CURRENT_CLEAR_MAP)
 		add hl, de
 		ld a, (CURRENT_CLEAR_COUNT)
@@ -808,42 +866,41 @@ EXISTING_OP:
 		ld h, 0
 		ld d, h
 		ld e, l
-#line 897
+#line 922
 		add hl, hl
 		add hl, hl
-#line 898
+#line 923
 		add hl, de
-#line 904 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 929 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld de, (CURRENT_CLEAR_OPS)
 		add hl, de
 		ld (hl), c
 		inc hl
 		ld (hl), b
 		inc hl
-#line 908
+#line 933
 		pop de
 		ld (hl), e
 		inc hl
 		ld (hl), d
 		inc hl
-#line 913
-		ld a, 2
-		ld (hl), a
-#line 925 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 938
+		ld (hl), 2
+#line 950 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		pop hl
 		push de
-#line 931 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 956 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ld de, (DRAW_OPS_DATA_INDEX)
 		ld (hl), e
 		inc hl
 		ld (hl), d
 		inc hl
-#line 936
+#line 961
 		ld hl, 8
 		add hl, de
 		ld (DRAW_OPS_DATA_INDEX), hl
 		pop bc
-#line 946 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 971 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		pop hl
 		pop hl
 		ld a, (bc)
@@ -891,7 +948,7 @@ EXISTING_OP:
 		ld a, (bc)
 		or (hl)
 		ld (de), a
-#line 1005 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1031 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		ret
 REAL_EXISTING_OP:
 		pop hl
@@ -899,7 +956,7 @@ REAL_EXISTING_OP:
 		pop hl
 		pop hl
 		pop hl
-#line 1018 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1044 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 		pop hl
 		ex de, hl
 		ld a, (de)
@@ -940,7 +997,7 @@ REAL_EXISTING_OP:
 		ld a, (de)
 		or (hl)
 		ld (hl),  a
-#line 1023
+#line 1049
 		ret
 		ENDP
 		PROC
@@ -974,7 +1031,7 @@ DRAW_1x1_SPRITE:
 		inc hl
 		ld d, (hl)
 		inc hl
-#line 1070
+#line 1096
 		ld a, b
 		or c
 		and 1
@@ -1040,7 +1097,7 @@ DRAW_1x2_SPRITE:
 		inc hl
 		ld d, (hl)
 		inc hl
-#line 1166
+#line 1192
 		ld a, b
 		or c
 		and 1
@@ -1106,7 +1163,7 @@ DRAW_2x2_SPRITE:
 		inc hl
 		ld d, (hl)
 		inc hl
-#line 1256
+#line 1282
 		ld a, b
 		or c
 		and 1
@@ -1192,7 +1249,7 @@ SET_TILEMAP:
 		inc hl
 		ld (hl), d
 		inc hl
-#line 1371
+#line 1397
 		ret
 		ENDP
 		PROC
@@ -1202,7 +1259,7 @@ SET_TILE:
 		add hl, hl
 		add hl, hl
 		add hl, hl
-#line 1380
+#line 1406
 		add hl, de
 		ex de, hl
 		ld hl, TILE_MAP
@@ -1216,7 +1273,7 @@ SET_TILE:
 		add hl, hl
 		add hl, hl
 		add hl, hl
-#line 1399
+#line 1425
 		ld bc, (TILE_SET)
 		add hl, bc
 		ld a, d
@@ -1257,9 +1314,24 @@ SET_TILE:
 		ld (de), a
 		ret
 		ENDP
-#line 1448 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+		PROC
+GET_TILE:
+		add hl, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+		add hl, hl
+#line 1476
+		add hl, de
+		ex de, hl
+		ld hl, TILE_MAP
+		add hl, de
+		ld a, (hl)
+		ret
+		ENDP
+#line 1491 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
 GSPRITES_LIB_END:
-#line 1061
+#line 1134
 	ld a, 2
 	call BORDER
 	call CLS
@@ -2074,11 +2146,9 @@ _InitGFXLib:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 1678
-#line 1461 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1778
 		call INIT_GFX_LIB
-#line 1465 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
-#line 1681
+#line 1779
 _InitGFXLib__leave:
 	ld sp, ix
 	pop ix
@@ -2087,27 +2157,25 @@ _RenderFrame:
 	push ix
 	ld ix, 0
 	add ix, sp
-#line 1701
+#line 1798
 		call RENDER_FRAME
-#line 1494 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
-#line 1703
+#line 1799
 _RenderFrame__leave:
 	ld sp, ix
 	pop ix
 	ret
 _Create1x1Sprite:
-#line 1713
-#line 1506 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1808
 		push ix
+		push iy
 		call CREATE_1x1_SPRITE
+		pop iy
 		pop ix
-#line 1512 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
-#line 1718
+#line 1813
 _Create1x1Sprite__leave:
 	ret
 _Draw1x1Sprite:
-#line 1727
-#line 1524 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1822
 		exx
 		pop hl
 		exx
@@ -2117,26 +2185,26 @@ _Draw1x1Sprite:
 		push hl
 		exx
 		push ix
+		push iy
 		ld c, d
 		call DRAW_1x1_SPRITE
+		pop iy
 		pop ix
-#line 1544 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
-#line 1741
+#line 1836
 _Draw1x1Sprite__leave:
 	ret
 _Create1x2Sprite:
-#line 1755
-#line 1556 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1846
 		push ix
+		push iy
 		call CREATE_1x2_SPRITE
+		pop iy
 		pop ix
-#line 1562 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
-#line 1760
+#line 1851
 _Create1x2Sprite__leave:
 	ret
 _Draw1x2Sprite:
-#line 1769
-#line 1574 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1860
 		exx
 		pop hl
 		exx
@@ -2146,26 +2214,26 @@ _Draw1x2Sprite:
 		push hl
 		exx
 		push ix
+		push iy
 		ld c, d
 		call DRAW_1x2_SPRITE
+		pop iy
 		pop ix
-#line 1590 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
-#line 1783
+#line 1874
 _Draw1x2Sprite__leave:
 	ret
 _Create2x2Sprite:
-#line 1793
-#line 1602 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1883
 		push ix
+		push iy
 		call CREATE_2x2_SPRITE
+		pop iy
 		pop ix
-#line 1608 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
-#line 1798
+#line 1888
 _Create2x2Sprite__leave:
 	ret
 _Draw2x2Sprite:
-#line 1807
-#line 1620 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
+#line 1897
 		exx
 		pop hl
 		exx
@@ -2175,21 +2243,22 @@ _Draw2x2Sprite:
 		push hl
 		exx
 		push ix
+		push iy
 		ld c, d
 		call DRAW_2x2_SPRITE
+		pop iy
 		pop ix
-#line 1637 "C:/Users/geniw/source/repos/GuSprites/GuSprites/ZxBasicFiles/GuSprites.zxbas"
-#line 1821
+#line 1911
 _Draw2x2Sprite__leave:
 	ret
 _SetTileset:
-#line 1834
+#line 1922
 		call SET_TILEMAP
-#line 1835
+#line 1923
 _SetTileset__leave:
 	ret
 _SetTile:
-#line 1842
+#line 1930
 		exx
 		pop hl
 		exx
@@ -2200,7 +2269,7 @@ _SetTile:
 		push hl
 		exx
 		call SET_TILE
-#line 1852
+#line 1940
 _SetTile__leave:
 	ret
 #line 1 "array.asm"
@@ -2372,7 +2441,7 @@ TMP_ARR_PTR:
 
 		ENDP
 
-#line 1981 "TestLib.zxbas"
+#line 2050 "TestLib.zxbas"
 #line 1 "border.asm"
 
 	; __FASTCALL__ Routine to change de border
@@ -2382,7 +2451,7 @@ TMP_ARR_PTR:
 
 	; Nothing to do! (Directly from the ZX Spectrum ROM)
 
-#line 1982 "TestLib.zxbas"
+#line 2051 "TestLib.zxbas"
 #line 1 "cls.asm"
 
 	; JUMPS directly to spectrum CLS
@@ -2465,7 +2534,7 @@ __CLS_SCR:
 								    ; to get the start of the screen
 		ENDP
 
-#line 1983 "TestLib.zxbas"
+#line 2052 "TestLib.zxbas"
 #line 1 "mul8.asm"
 
 __MUL8:		; Performs 8bit x 8bit multiplication
@@ -2519,6 +2588,6 @@ __MUL8B:
 		ret		; result = HL
 		ENDP
 
-#line 1984 "TestLib.zxbas"
+#line 2053 "TestLib.zxbas"
 
 	END

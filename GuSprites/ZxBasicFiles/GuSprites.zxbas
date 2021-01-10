@@ -23,7 +23,8 @@
 
 'The lib by default disables interrupts, enabling this option
 'will reactivate them after each call to the lib
-'#define ENABLE_INTERRUPTS
+#define ENABLE_INTERRUPTS
+
 
 asm
 
@@ -302,9 +303,13 @@ PROC
 LOCAL RENDER_LOOP, END_RENDER, RESTORE_STACK
 RENDER_FRAME:                                         ;TRASHES: BC, DE, HL, A
 
+#ifndef ENABLE_INTERRUPTS
 ei
+#endif
 halt
+#ifndef ENABLE_INTERRUPTS
 di
+#endif
 
 
 ld a, (CURRENT_DRAW_COUNT)
@@ -708,7 +713,6 @@ ld l, a                                     ;compute op dispplacement
 ld h, 0
 
 #ifdef ENABLE_TILES
-
 COPY_16B_REG(h,l, d,e)
 HL_POW2_2()                                  ;num * 5
 add hl, de
@@ -1466,6 +1470,23 @@ ld (de), a
 ret
 ENDP
 
+PROC
+GET_TILE:               ;input: de = x, hl = y, trashes de, hl, a
+
+HL_POW2_5()              ;y * 32
+
+add hl, de              ;+ x
+
+ex de, hl
+
+ld hl, TILE_MAP
+add hl, de              ;+ tile_map address
+
+ld a, (hl)              ;get tile number
+
+ret
+ENDP
+
 #endif
 
 GSPRITES_LIB_END:
@@ -1477,13 +1498,8 @@ sub InitGFXLib()
 
 asm
 
-#ifdef ENABLE_INTERRUPTS
-    di
-#endif
     call INIT_GFX_LIB
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
+
 end asm
 
 end sub
@@ -1492,13 +1508,7 @@ sub ResetGFXLib()
 
 asm
 
-#ifdef ENABLE_INTERRUPTS
-    di
-#endif
     call RESET_GFX_LIB
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
 
 end asm
 
@@ -1510,10 +1520,6 @@ asm
 
     call RENDER_FRAME
 
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
-
 end asm
 
 end sub
@@ -1522,15 +1528,11 @@ function fastcall Create1x1Sprite(SpriteAddress as uInteger) as uByte
 
 asm
 
-#ifdef ENABLE_INTERRUPTS
-    di
-#endif
     push ix
+    push iy
     call CREATE_1x1_SPRITE
+    pop iy
     pop ix
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
 
 end asm
 
@@ -1540,10 +1542,6 @@ sub fastcall Draw1x1Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
 
 asm
 
-#ifdef ENABLE_INTERRUPTS
-    di
-#endif
-
     exx
     pop hl
     exx
@@ -1554,15 +1552,11 @@ asm
     exx
 
     push ix
-
+    push iy
     ld c, d
     call DRAW_1x1_SPRITE
-
+    pop iy
     pop ix
-
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
 
 end asm
 
@@ -1572,15 +1566,11 @@ function fastcall Create1x2Sprite(SpriteAddress as uInteger) as uByte
 
 asm
 
-#ifdef ENABLE_INTERRUPTS
-    di
-#endif
     push ix
+    push iy
     call CREATE_1x2_SPRITE
+    pop iy
     pop ix
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
 
 end asm
 
@@ -1590,10 +1580,6 @@ sub fastcall Draw1x2Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
 
 asm
 
-#ifdef ENABLE_INTERRUPTS
-    di
-#endif
-
     exx
     pop hl
     exx
@@ -1603,12 +1589,11 @@ asm
     push hl
     exx
     push ix
+    push iy
     ld c, d
     call DRAW_1x2_SPRITE
+    pop iy
     pop ix
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
 
 end asm
 
@@ -1618,15 +1603,11 @@ function fastcall Create2x2Sprite(SpriteAddress as uInteger) as uByte
 
 asm
 
-#ifdef ENABLE_INTERRUPTS
-    di
-#endif
     push ix
+    push iy
     call CREATE_2x2_SPRITE
+    pop iy
     pop ix
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
 
 end asm
 
@@ -1635,10 +1616,6 @@ end function
 sub fastcall Draw2x2Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
 
 asm
-
-#ifdef ENABLE_INTERRUPTS
-    di
-#endif
 
     exx
     pop hl
@@ -1649,13 +1626,11 @@ asm
     push hl
     exx
     push ix
+    push iy
     ld c, d
     call DRAW_2x2_SPRITE
+    pop iy
     pop ix
-
-#ifdef ENABLE_INTERRUPTS
-    ei
-#endif
 
 end asm
 
@@ -1687,5 +1662,18 @@ asm
 end asm
 
 end sub
+
+function fastcall GetTile(X as uInteger, Y as uInteger) as uByte
+
+asm
+    pop bc
+    pop de
+    push bc
+    ex de, hl
+    call GET_TILE
+    ret
+end asm
+
+end function
 
 #endif
