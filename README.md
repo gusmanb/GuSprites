@@ -19,6 +19,17 @@ load/unload sprites from the library as needed, you aren't restricted to a singl
 
 The library is completely free for use but a mention would be appreciated ;)
 
+## UPDATE 2021-01-23
+
+Added "SetTileChecked" function.
+
+As the clear operations are created at the same time a sprite has been moved, if your game
+must change that tile after the sprite leaves the tile then that cell will be rendered
+incorrectly with the old tile.
+
+To avoid this now you can use "SetTileChecked", it will check all find any clear op affecting
+the tile and modify it setting the new tile as the source.
+
 ## So, where the heck do I begin?
 
 First, download the lib and give a look to the test program ;)

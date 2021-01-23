@@ -194,6 +194,18 @@ SPRITE_INDEX_SIZE equ ((TOTAL_1x1_SPRITES + TOTAL_1x2_SPRITES + TOTAL_2x2_SPRITE
 ;JUMP TO PROG START
 jp GSPRITES_LIB_END
 
+;draw op structure:
+;
+;non-tiled:
+;0x00 = Screen Address
+;0x02 = Buffer address
+;
+;tiled.
+;0x00 = Screen Address
+;0x02 = Buffer address
+;0x04 = op type (draw op = 1, tile clear op = 2)
+
+
 ;VARIABLES
 
 DRAW_OPS_A:                 ;buffer de operaciones A
@@ -1471,6 +1483,127 @@ ret
 ENDP
 
 PROC
+LOCAL REAL_OP, NO_OP, END_SET
+
+SET_TILE_CHECKED:       ;input: a = tile number, c = color, e = x, l = y, trashes bc, de, hl, a
+
+HL_POW2_5()             ;y * 32
+
+add hl, de              ;+ x
+
+push hl                 ;store displacement for later check of clear ops
+
+ex de, hl
+
+ld hl, TILE_MAP
+add hl, de              ;+ tile_map address
+
+ld (hl), a              ;set tile number
+
+ld hl, $5800
+add hl, de
+ld (hl), c              ;set tile color
+
+
+ld l, a                 ;get tile source address
+ld h, 0
+
+HL_POW2_3()
+
+ld bc, (TILE_SET)
+add hl, bc
+
+push hl                 ;store tile source address for later check
+
+ld a, d                 ;calculate screen address
+rla
+rla
+rla
+or %01000000
+ld d, a
+
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+ld a, (hl)
+    ld (de), a
+    inc hl
+    inc d
+
+ld a, (hl)
+ld (de), a
+
+pop bc                                  ;tile source address
+pop hl                                  ;displacement
+
+ld de, (CURRENT_DRAW_MAP)
+
+push bc                                ;preserve tile source address
+
+add hl, de                             ;advance pointer to concrete cell
+
+ld a, (hl)
+and a
+jp z, NO_OP                            ;a = num op
+
+REAL_OP:
+
+dec a
+
+ld l, a
+ld h, 0
+
+COPY_16B_REG(h,l, d,e)
+HL_POW2_2()
+add hl, de                                  ;hl = offset, a = numop
+
+ld bc, (CURRENT_DRAW_OPS)
+
+add hl, bc                                  ;get current op address
+
+inc hl
+inc hl
+
+pop de
+
+WRITE_HL_POINTER(d, e)
+
+ld a, 2
+ld (hl), a
+
+jp END_SET
+
+NO_OP:
+
+pop hl
+
+END_SET:
+
+ret
+ENDP
+
+PROC
 GET_TILE:               ;input: de = x, hl = y, trashes de, hl, a
 
 HL_POW2_5()              ;y * 32
@@ -1659,6 +1792,23 @@ asm
     push hl
     exx
     call SET_TILE
+end asm
+
+end sub
+
+sub fastcall SetTileChecked(TileNumber as uByte, Color as uInteger, X as uInteger, Y as uInteger)
+
+asm
+    exx
+    pop hl
+    exx
+    pop bc
+    pop de
+    pop hl
+    exx
+    push hl
+    exx
+    call SET_TILE_CHECKED
 end asm
 
 end sub
