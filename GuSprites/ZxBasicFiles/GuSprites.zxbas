@@ -1808,10 +1808,11 @@ sub fastcall CancelOps()
 
 end sub
 
-sub ClearScreen(NewInk as uByte, NewPaper as uByte)
+sub ClearScreen(NewInk as uByte, NewPaper as uByte, NewBright as uByte)
 
     ink NewInk
     paper NewPaper
+    bright NewBright
     cls
 
     asm
