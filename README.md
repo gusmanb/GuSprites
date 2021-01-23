@@ -30,6 +30,19 @@ incorrectly with the old tile.
 To avoid this now you can use "SetTileChecked", it will check all find any clear op affecting
 the tile and modify it setting the new tile as the source.
 
+Added "CancelOps" function
+
+If you have drawn a frame and want to preserve it as a background then you must get rid
+of the clear operations or whenever you render a new frame these ops will clear the last
+position of your old sprites.
+
+This function will erase these operations.
+
+Added "ClearScreen" function
+
+This will clear the screen, tile map and pending operations all at once but will preserve
+loaded sprites, not like ResetGFXLib,
+
 ## So, where the heck do I begin?
 
 First, download the lib and give a look to the test program ;)
