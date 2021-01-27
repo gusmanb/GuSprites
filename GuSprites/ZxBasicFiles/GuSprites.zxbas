@@ -1,7 +1,7 @@
 ﻿
 'CONFIG DEFINES
 
-/'
+
 'Total number of 1x1 defined sprites
 #define TOTAL_1x1_SPRITES 4
 'Total number of 1x2 defined sprites
@@ -25,11 +25,13 @@
 'The lib by default disables interrupts, enabling this option
 'will reactivate them after each call to the lib
 #define ENABLE_INTERRUPTS
-'/
+
 
 asm
 
 ;MACROS
+
+#define CREATE_ATTRIB(ink, paper, bright, flash) (ink + (paper << 3) + (bright << 6) + (flash << 7))
 
 #define READ_HL_POINTER(Hi,Lo) \
 ld Lo, (hl) \
@@ -1848,7 +1850,7 @@ end asm
 
 end sub
 
-sub fastcall SetTileChecked(TileNumber as uByte, Color as uInteger, X as uInteger, Y as uInteger)
+sub fastcall SetTileChecked(TileNumber as uByte, Attribute as uInteger, X as uInteger, Y as uInteger)
 
 asm
     exx
@@ -1877,5 +1879,59 @@ asm
 end asm
 
 end function
+
+sub SetObject(ObjectTileIndex as uByte, Width as uByte, Height as uByte, Attribute as uByte, X as uByte, Y as uByte)
+
+    Dim tmpX as uByte
+    Dim tmpY as uByte
+
+    for tmpX = X to X + Width - 1
+        for tmpY = Y to Y + Height - 1
+            SetTile(ObjectTileIndex, Attribute, tmpX, tmpY)
+            ObjectTileIndex = ObjectTileIndex + 1
+        next tmpY
+    next tmpX
+
+end sub
+
+sub FillWithTile(TileIndex as uByte, Width as uByte, Height as uByte, Attribute as uByte, X as uByte, Y as uByte)
+
+    Dim tmpX as uByte
+    Dim tmpY as uByte
+
+    for tmpX = X to X + Width - 1
+        for tmpY = Y to Y + Height - 1
+            SetTile(TileIndex, Attribute, tmpX, tmpY)
+        next tmpY
+    next tmpX
+
+end sub
+
+sub SetObjectChecked(ObjectTileIndex as uByte, Width as uByte, Height as uByte, Attribute as uByte, X as uByte, Y as uByte)
+
+    Dim tmpX as uByte
+    Dim tmpY as uByte
+
+    for tmpX = X to X + Width - 1
+        for tmpY = Y to Y + Height - 1
+            SetTileChecked(ObjectTileIndex, Attribute, tmpX, tmpY)
+            ObjectTileIndex = ObjectTileIndex + 1
+        next tmpY
+    next tmpX
+
+end sub
+
+sub FillWithTileChecked(TileIndex as uByte, Width as uByte, Height as uByte, Attribute as uByte, X as uByte, Y as uByte)
+
+    Dim tmpX as uByte
+    Dim tmpY as uByte
+
+    for tmpX = X to X + Width - 1
+        for tmpY = Y to Y + Height - 1
+            SetTileChecked(TileIndex, Attribute, tmpX, tmpY)
+        next tmpY
+    next tmpX
+
+end sub
 
 #endif

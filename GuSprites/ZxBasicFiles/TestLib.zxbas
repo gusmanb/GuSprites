@@ -9,10 +9,11 @@ Dim sprite(8) as uByte => { 64,70,70,64,8,244,2,1 }
 Dim sprite2(16) as uByte => { 20,189,66,74,34,28,8,20, 50,34,70,101,58,18,19,24 }
 Dim sprite3(32) as uByte => { 73,73,73,73,73,73,73,73, 0,0,255,0,0,255,0,0, 73,73,73,73,73,73,73,73, 0,0,255,0,0,255,0,0 }
 
-Dim tileSet(3,8) as uByte => { _ 
+Dim tileSet(4,8) as uByte => { _ 
     {0,0,0,0,0,0,0,0}, _
     { 0,60,66,66,66,66,60,0 }, _
-    { 0,24,24,36,66,66,126,0 } _
+    { 0,24,24,36,66,66,126,0 }, _
+    { 12,34,44,65,93,234,26,0 } _
 }
 
 Dim sNumber as uByte
@@ -39,6 +40,8 @@ for y = 0 to 23
     end if
 
 next y
+
+FillWithTile(3,2,2,CREATE_ATTRIB(6,2,1,0),4,4)
 
 sNumber = Create1x1Sprite(@sprite)
 sNumber2 = Create1x2Sprite(@sprite2)
