@@ -1880,7 +1880,7 @@ end asm
 
 end function
 
-sub SetObject(ObjectTileIndex as uByte, Width as uByte, Height as uByte, Attribute as uByte, X as uByte, Y as uByte)
+sub SetTiledObject(ObjectTileIndex as uByte, Width as uByte, Height as uByte, Attribute as uByte, X as uByte, Y as uByte)
 
     Dim tmpX as uByte
     Dim tmpY as uByte
@@ -1907,7 +1907,7 @@ sub FillWithTile(TileIndex as uByte, Width as uByte, Height as uByte, Attribute 
 
 end sub
 
-sub SetObjectChecked(ObjectTileIndex as uByte, Width as uByte, Height as uByte, Attribute as uByte, X as uByte, Y as uByte)
+sub SetTiledObjectChecked(ObjectTileIndex as uByte, Width as uByte, Height as uByte, Attribute as uByte, X as uByte, Y as uByte)
 
     Dim tmpX as uByte
     Dim tmpY as uByte

@@ -21,10 +21,11 @@ The library is completely free for use but a mention would be appreciated ;)
 
 ## UPDATE 2021-01-27
 
-Added "SetObject" and "SetObjectChecked" functions.
+Added "SetTiledObject" and "SetTiledObjectChecked" functions.
 
 This will fill the specified area with an object splitted in tiles.
-The order of the tiles must be top-down, left-right, like sprites.
+The object tiles must be added to the tileset in contiguous elements.
+The order of the tiles must be top-down-left-right, like sprites.
 
 Added "FillWithTile" and "FillWithTileChecked" functions.
 
