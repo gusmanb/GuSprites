@@ -19,6 +19,22 @@ load/unload sprites from the library as needed, you aren't restricted to a singl
 
 The library is completely free for use but a mention would be appreciated ;)
 
+## UPDATE 2021-01-27
+
+Added "SetObject" and "SetObjectChecked" functions.
+
+This will fill the specified area with an object splitted in tiles.
+The order of the tiles must be top-down, left-right, like sprites.
+
+Added "FillWithTile" and "FillWithTileChecked" functions.
+
+This will fill the specified area with a single tile.
+
+Added "CREATE_ATTRIB" macro.
+
+Macro to ease the attribute creation but without wasting CPU cicles as
+this will be precomputed by the compiler.
+
 ## UPDATE 2021-01-23
 
 Added "SetTileChecked" function.
