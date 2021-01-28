@@ -1546,6 +1546,57 @@ add hl, bc
 
 push hl                 ;store tile source address for later check
 
+pop bc                                  ;tile source address
+pop hl                                  ;displacement
+
+push hl
+push de
+push bc                                ;preserve tile source address
+
+ld de, (CURRENT_DRAW_MAP)
+
+add hl, de                             ;advance pointer to concrete cell
+
+ld a, (hl)
+and a
+jp z, NO_OP                            ;a = num op
+
+REAL_OP:
+
+dec a
+
+ld l, a
+ld h, 0
+
+COPY_16B_REG(h,l, d,e)
+HL_POW2_2()
+add hl, de                                  ;hl = offset, a = numop
+
+ld bc, (CURRENT_DRAW_OPS)
+
+add hl, bc                                  ;get current op address
+
+inc hl
+inc hl
+
+pop de
+
+WRITE_HL_POINTER(d, e)
+
+ld a, 2
+ld (hl), a
+
+pop de                                  ;cleanup
+pop de                                  ;cleanup
+
+jp END_SET
+
+NO_OP:
+
+pop hl
+pop de
+pop bc
+
 ld a, d                 ;calculate screen address
 rla
 rla
@@ -1584,50 +1635,6 @@ ld a, (hl)
 
 ld a, (hl)
 ld (de), a
-
-pop bc                                  ;tile source address
-pop hl                                  ;displacement
-
-ld de, (CURRENT_DRAW_MAP)
-
-push bc                                ;preserve tile source address
-
-add hl, de                             ;advance pointer to concrete cell
-
-ld a, (hl)
-and a
-jp z, NO_OP                            ;a = num op
-
-REAL_OP:
-
-dec a
-
-ld l, a
-ld h, 0
-
-COPY_16B_REG(h,l, d,e)
-HL_POW2_2()
-add hl, de                                  ;hl = offset, a = numop
-
-ld bc, (CURRENT_DRAW_OPS)
-
-add hl, bc                                  ;get current op address
-
-inc hl
-inc hl
-
-pop de
-
-WRITE_HL_POINTER(d, e)
-
-ld a, 2
-ld (hl), a
-
-jp END_SET
-
-NO_OP:
-
-pop hl
 
 END_SET:
 

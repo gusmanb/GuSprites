@@ -19,6 +19,14 @@ load/unload sprites from the library as needed, you aren't restricted to a singl
 
 The library is completely free for use but a mention would be appreciated ;)
 
+## UPDATE 2021-01-28
+
+Updated the *Checked functions.
+
+Now the checked functions will not redraw the tile if an erase operation is found, in this case the
+erase operation is replaced with the tile source address and the RenderFrame will draw it.
+This avoids flickering in some scenarios.
+
 ## UPDATE 2021-01-27
 
 Added "SetTiledObject" and "SetTiledObjectChecked" functions.
