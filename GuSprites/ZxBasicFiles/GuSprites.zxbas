@@ -1,6 +1,8 @@
-﻿
-'CONFIG DEFINES
+﻿'CONFIG DEFINES
 
+#define ENABLE_1x1_SPRITES
+#define ENABLE_1x2_SPRITES
+#define ENABLE_2x2_SPRITES
 
 'Total number of 1x1 defined sprites
 #define TOTAL_1x1_SPRITES 4
@@ -166,6 +168,26 @@ ldi \
 ldi \
 ldi \
 
+#ifndef ENABLE_1x1_SPRITES
+
+    #define TOTAL_1x1_SPRITES 0
+    #define ONSCREEN_1x1_SPRITES 0
+
+#endif
+
+#ifndef ENABLE_1x2_SPRITES
+
+    #define TOTAL_1x2_SPRITES 0
+    #define ONSCREEN_1x2_SPRITES 0
+
+#endif
+
+#ifndef ENABLE_2x2_SPRITES
+
+    #define TOTAL_2x2_SPRITES 0
+    #define ONSCREEN_2x2_SPRITES 0
+
+#endif
 
 ;LIB DEFINES
 SPRITE_1x1_BUFFER_SIZE equ (6 * 8)
@@ -473,6 +495,7 @@ pop hl
 ret
 ENDP
 
+#ifdef ENABLE_1x1_SPRITES
 
 PROC
 LOCAL LOOP
@@ -525,6 +548,9 @@ ld a, (SPRITE_COUNT)      ;read sprite number
 ret
 ENDP
 
+#endif
+
+#ifdef ENABLE_1x2_SPRITES
 
 PROC
 LOCAL LOOP
@@ -579,6 +605,10 @@ ld a, (SPRITE_COUNT)      ;read sprite number
 ret
 
 ENDP
+
+#endif
+
+#ifdef ENABLE_2x2_SPRITES
 
 PROC
 LOCAL LOOP
@@ -644,6 +674,8 @@ ld a, (SPRITE_COUNT)      ;read sprite number
 
 ret
 ENDP
+
+#endif
 
 PROC
 LOCAL EXISTING_OP, REAL_EXISTING_OP
@@ -1123,7 +1155,7 @@ jr nz, LOOP
 ret
 ENDP
 
-
+#ifdef ENABLE_1x1_SPRITES
 
 PROC
 LOCAL TEST_SHIFTS, HORIZONTAL_SHIFT, VERTICAL_SHIFT
@@ -1221,6 +1253,10 @@ call DRAW_SPRITE_COLUMN
 ret
 ENDP
 
+#endif
+
+#ifdef ENABLE_1x2_SPRITES
+
 PROC
 LOCAL TEST_SHIFTS, HORIZONTAL_SHIFT, VERTICAL_SHIFT
 DRAW_1x2_SPRITE:            ;input: a = sprite number, b=x, c=y
@@ -1311,6 +1347,10 @@ call DRAW_SPRITE_COLUMN
 
 ret
 ENDP
+
+#endif
+
+#ifdef ENABLE_2x2_SPRITES
 
 PROC
 DRAW_2x2_SPRITE:            ;input: a = sprite number
@@ -1430,6 +1470,8 @@ call DRAW_SPRITE_COLUMN     ;draw second row
 
 ret
 ENDP
+
+#endif
 
 #ifdef ENABLE_TILES
 PROC
@@ -1695,6 +1737,8 @@ end asm
 
 end sub
 
+#ifdef ENABLE_1x1_SPRITES
+
 function fastcall Create1x1Sprite(SpriteAddress as uInteger) as uByte
 
 asm
@@ -1733,6 +1777,10 @@ end asm
 
 end sub
 
+#endif
+
+#ifdef ENABLE_1x2_SPRITES
+
 function fastcall Create1x2Sprite(SpriteAddress as uInteger) as uByte
 
 asm
@@ -1770,6 +1818,10 @@ end asm
 
 end sub
 
+#endif
+
+#ifdef ENABLE_2x2_SPRITES
+
 function fastcall Create2x2Sprite(SpriteAddress as uInteger) as uByte
 
 asm
@@ -1806,6 +1858,8 @@ asm
 end asm
 
 end sub
+
+#endif
 
 sub fastcall CancelOps()
 
