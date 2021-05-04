@@ -19,6 +19,18 @@ load/unload sprites from the library as needed, you aren't restricted to a singl
 
 The library is completely free for use but a mention would be appreciated ;)
 
+## UPDATE 2021-05-04
+
+Accumulative update with precomputed sprites support.
+
+The biggest point on this update is the precomputed sprites support. This feature will allow to reduce the memory footprint
+of the library in programs that use static sprite sets. Also the functionality is intended to be used wit the newly
+released ![ResourceDesigner](https://github.com/gusmanb/ResourceDesigner), check it for more info.
+
+- Now you can use precomputed sprites to reduce the memory footprint. Check the library for instructions on how to use.
+- Added defines to enable/disable sprite types (reduce memory footprint)
+- Corrected multiple errors in defines
+
 ## UPDATE 2021-01-28
 
 Updated the *Checked functions.
