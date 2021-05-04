@@ -1,5 +1,16 @@
 ﻿'CONFIG DEFINES
 
+'Enabling this define tells the library that we are going to use precomputed sprites.
+'Using precomputed sprites will help to reduce the library's memory footprint when
+'your program is going to use a single sprite set.
+'To generate the precomputed sprites I recommend to use the ResourceDesigner program
+'that you will find in my Github repository (https://github.com/gusmanb/ResourceDesigner).
+' 
+'Remember to modify also the include that is defined at the bottom of the 
+'assembler variable declarations.
+
+'#define PRECOMPUTED_SPRITES
+
 #define ENABLE_1x1_SPRITES
 #define ENABLE_1x2_SPRITES
 #define ENABLE_2x2_SPRITES
@@ -265,6 +276,20 @@ defw 0
 CURRENT_CLEAR_MAP:          ;puntero a uno de los mapas de celdas que se usa para almacenar las id's de operaciones de limpieza por su posición
 defw 0
 
+#ifndef ENABLE_TILES
+EMPTY_CHAR:
+defs 8
+#endif
+
+#ifdef ENABLE_TILES
+TILE_SET:
+defw 0
+TILE_MAP:
+defs 768
+#endif
+
+#ifndef PRECOMPUTED_SPRITES
+
 SPRITE_BUFFER:              ;shifted sprite buffer
 defs SPRITE_BUFFER_SIZE
 SPRITE_INDEX:               ;shifted sprite indexes (stores address of each sprite)
@@ -272,22 +297,16 @@ defs SPRITE_INDEX_SIZE
 SPRITE_COUNT:               ;number of created sprites
 defb 0
 
-#ifndef ENABLE_TILES
+#else
 
-EMPTY_CHAR:
-defs 8
+end asm
 
-#endif
+    'This is the precomputed sprites file
+    #include "Sprites.zxbas"
 
-#ifdef ENABLE_TILES
-
-TILE_SET:
-defw 0
-TILE_MAP:
-defs 768
+asm
 
 #endif
-
 
 ;CODE
 
@@ -322,13 +341,17 @@ WRITE_16B_ADDRESS(CELL_MAP_B, CURRENT_CLEAR_MAP, hl)
 
 WRITE_16B_ADDRESS(DRAW_OPS_DATA, DRAW_OPS_DATA_INDEX, hl)
 
+#ifndef PRECOMPUTED_SPRITES
+ERASE_MEMORY(SPRITE_BUFFER, SPRITE_BUFFER_SIZE)
 WRITE_16B_ADDRESS(SPRITE_BUFFER, SPRITE_INDEX, hl)
+xor a
+ld (SPRITE_COUNT), a
+#endif
 
 xor a
 ld (CURRENT_DRAW_COUNT), a
 ld (CURRENT_CLEAR_COUNT), a
 
-ERASE_MEMORY(SPRITE_BUFFER, SPRITE_BUFFER_SIZE)
 ERASE_MEMORY(CELL_MAP_A, 768)
 ERASE_MEMORY(CELL_MAP_B, 768)
 
@@ -466,6 +489,7 @@ WRITE_16B_ADDRESS(DRAW_OPS_DATA, DRAW_OPS_DATA_INDEX, hl) ; reset op index
 ret
 ENDP
 
+#ifndef PRECOMPUTED_SPRITES
 
 PROC
 CREATE_SPRITE_BUFFER:          ;input: bc = buffer sze, output: hl = sprite buffer address, trash = bc, de, hl, a
@@ -674,6 +698,8 @@ ld a, (SPRITE_COUNT)      ;read sprite number
 
 ret
 ENDP
+
+#endif
 
 #endif
 
@@ -1739,6 +1765,8 @@ end sub
 
 #ifdef ENABLE_1x1_SPRITES
 
+#ifndef PRECOMPUTED_SPRITES
+
 function fastcall Create1x1Sprite(SpriteAddress as uInteger) as uByte
 
 asm
@@ -1752,6 +1780,8 @@ asm
 end asm
 
 end function
+
+#endif
 
 sub fastcall Draw1x1Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
 
@@ -1781,6 +1811,8 @@ end sub
 
 #ifdef ENABLE_1x2_SPRITES
 
+#ifndef PRECOMPUTED_SPRITES
+
 function fastcall Create1x2Sprite(SpriteAddress as uInteger) as uByte
 
 asm
@@ -1794,6 +1826,8 @@ asm
 end asm
 
 end function
+
+#endif
 
 sub fastcall Draw1x2Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
 
@@ -1822,6 +1856,8 @@ end sub
 
 #ifdef ENABLE_2x2_SPRITES
 
+#ifndef PRECOMPUTED_SPRITES
+
 function fastcall Create2x2Sprite(SpriteAddress as uInteger) as uByte
 
 asm
@@ -1835,6 +1871,8 @@ asm
 end asm
 
 end function
+
+#endif
 
 sub fastcall Draw2x2Sprite(SpriteNumber as uByte, X as uByte, Y as uByte)
 
