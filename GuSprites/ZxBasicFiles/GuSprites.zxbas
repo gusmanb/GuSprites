@@ -11,6 +11,9 @@
 
 '#define PRECOMPUTED_SPRITES
 
+'Enabling this define changes the merge of the sprites and tiles to be a XOR instead of an OR
+'#define MERGE_WITH_XOR
+
 #define ENABLE_1x1_SPRITES
 #define ENABLE_1x2_SPRITES
 #define ENABLE_2x2_SPRITES
@@ -43,6 +46,12 @@
 asm
 
 ;MACROS
+
+#ifdef MERGE_WITH_XOR
+#define MERGE_OP xor
+#else
+#define MERGE_OP or
+#endif
 
 #define CREATE_ATTRIB(ink, paper, bright, flash) (ink + (paper << 3) + (bright << 6) + (flash << 7))
 
@@ -105,42 +114,42 @@ rr third \
 
 #define MERGE_CHAR(source, dest) \
 ld a, (source) \
-or (dest) \
+MERGE_OP (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-or (dest) \
+MERGE_OP (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-or (dest) \
+MERGE_OP (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-or (dest) \
+MERGE_OP (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-or (dest) \
+MERGE_OP (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-or (dest) \
+MERGE_OP (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-or (dest) \
+MERGE_OP (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-or (dest) \
+MERGE_OP (dest) \
 ld (dest),  a \
 
 
@@ -875,50 +884,50 @@ ld c, iyl
 ;hl = sprite address, de = buffer address, bc = tile address
 
 ld a, (de)
-    or (hl)
+    MERGE_OP (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    or (hl)
+    MERGE_OP (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    or (hl)
+    MERGE_OP (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    or (hl)
+    MERGE_OP (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    or (hl)
+    MERGE_OP (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    or (hl)
+    MERGE_OP (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    or (hl)
+    MERGE_OP (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 
     ld a, (de)
-    or (hl)
+    MERGE_OP (hl)
     ld (bc), a
 
 #else
@@ -1078,50 +1087,50 @@ pop hl                                      ;copy the data to the op
 ;hl = sprite address, de = buffer address, bc = tile address
 
 ld a, (bc)
-    or (hl)
+    MERGE_OP (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    or (hl)
+    MERGE_OP (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    or (hl)
+    MERGE_OP (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    or (hl)
+    MERGE_OP (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    or (hl)
+    MERGE_OP (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    or (hl)
+    MERGE_OP (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    or (hl)
+    MERGE_OP (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 
     ld a, (bc)
-    or (hl)
+    MERGE_OP (hl)
     ld (de), a
 
 #else
