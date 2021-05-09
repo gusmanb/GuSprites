@@ -47,12 +47,6 @@ asm
 
 ;MACROS
 
-#ifdef MERGE_WITH_XOR
-#define MERGE_OP xor
-#else
-#define MERGE_OP or
-#endif
-
 #define CREATE_ATTRIB(ink, paper, bright, flash) (ink + (paper << 3) + (bright << 6) + (flash << 7))
 
 #define READ_HL_POINTER(Hi,Lo) \
@@ -114,42 +108,42 @@ rr third \
 
 #define MERGE_CHAR(source, dest) \
 ld a, (source) \
-MERGE_OP (dest) \
+or (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-MERGE_OP (dest) \
+or (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-MERGE_OP (dest) \
+or (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-MERGE_OP (dest) \
+or (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-MERGE_OP (dest) \
+or (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-MERGE_OP (dest) \
+or (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-MERGE_OP (dest) \
+or (dest) \
 ld (dest),  a \
 inc source \
 inc dest \
 ld a, (source) \
-MERGE_OP (dest) \
+or (dest) \
 ld (dest),  a \
 
 
@@ -285,18 +279,6 @@ defw 0
 CURRENT_CLEAR_MAP:          ;puntero a uno de los mapas de celdas que se usa para almacenar las id's de operaciones de limpieza por su posición
 defw 0
 
-#ifndef ENABLE_TILES
-EMPTY_CHAR:
-defs 8
-#endif
-
-#ifdef ENABLE_TILES
-TILE_SET:
-defw 0
-TILE_MAP:
-defs 768
-#endif
-
 #ifndef PRECOMPUTED_SPRITES
 
 SPRITE_BUFFER:              ;shifted sprite buffer
@@ -310,12 +292,24 @@ defb 0
 
 end asm
 
-    'This is the precomputed sprites file
     #include "Sprites.zxbas"
 
 asm
 
 #endif
+
+#ifndef ENABLE_TILES
+EMPTY_CHAR:
+defs 8
+#endif
+
+#ifdef ENABLE_TILES
+TILE_SET:
+defw 0
+TILE_MAP:
+defs 768
+#endif
+
 
 ;CODE
 
@@ -884,50 +878,50 @@ ld c, iyl
 ;hl = sprite address, de = buffer address, bc = tile address
 
 ld a, (de)
-    MERGE_OP (hl)
+    or (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    MERGE_OP (hl)
+    or (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    MERGE_OP (hl)
+    or (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    MERGE_OP (hl)
+    or (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    MERGE_OP (hl)
+    or (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    MERGE_OP (hl)
+    or (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 ld a, (de)
-    MERGE_OP (hl)
+    or (hl)
     ld (bc), a
     inc bc
     inc de
     inc hl
 
     ld a, (de)
-    MERGE_OP (hl)
+    or (hl)
     ld (bc), a
 
 #else
@@ -1087,50 +1081,50 @@ pop hl                                      ;copy the data to the op
 ;hl = sprite address, de = buffer address, bc = tile address
 
 ld a, (bc)
-    MERGE_OP (hl)
+    or (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    MERGE_OP (hl)
+    or (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    MERGE_OP (hl)
+    or (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    MERGE_OP (hl)
+    or (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    MERGE_OP (hl)
+    or (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    MERGE_OP (hl)
+    or (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 ld a, (bc)
-    MERGE_OP (hl)
+    or (hl)
     ld (de), a
     inc bc
     inc de
     inc hl
 
     ld a, (bc)
-    MERGE_OP (hl)
+    or (hl)
     ld (de), a
 
 #else
@@ -1591,6 +1585,38 @@ ret
 ENDP
 
 PROC
+SET_TILE_COLOR:              ;input: c = color, e = x, l = y, trashes bc, de, hl, a
+
+
+HL_POW2_5()              ;y * 32
+
+add hl, de              ;+ x
+ex de, hl
+ld hl, $5800
+add hl, de
+ld (hl), c              ;set tile color
+
+ret
+
+ENDP
+
+PROC
+GET_TILE_COLOR:              ;input: e = x, l = y, trashes de, hl, a, output: a = color
+
+
+HL_POW2_5()              ;y * 32
+
+add hl, de              ;+ x
+ex de, hl
+ld hl, $5800
+add hl, de
+ld a, (hl)
+
+ret
+
+ENDP
+
+PROC
 LOCAL REAL_OP, NO_OP, END_SET
 
 SET_TILE_CHECKED:       ;input: a = tile number, c = color, e = x, l = y, trashes bc, de, hl, a
@@ -1958,6 +1984,23 @@ end asm
 
 end sub
 
+sub fastcall SetTileColor(X as uInteger, Y as uInteger, Color as uInteger)
+
+asm
+    exx
+    pop hl
+    exx
+    pop de
+    pop bc
+    ex de, hl
+    exx
+    push hl
+    exx
+    call SET_TILE_COLOR
+end asm
+
+end sub
+
 sub fastcall SetTileChecked(TileNumber as uByte, Attribute as uInteger, X as uInteger, Y as uInteger)
 
 asm
@@ -1983,7 +2026,19 @@ asm
     push bc
     ex de, hl
     call GET_TILE
-    ret
+end asm
+
+end function
+
+
+function fastcall GetTileColor(X as uInteger, Y as uInteger) as uByte
+
+asm
+    pop bc
+    pop de
+    push bc
+    ex de, hl
+    call GET_TILE_COLOR
 end asm
 
 end function
