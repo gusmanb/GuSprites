@@ -2213,4 +2213,52 @@ sub FillWithTileChecked(TileIndex as uByte, Width as uByte, Height as uByte, Att
 
 end sub
 
+function IsPair(Number as uByte) as uByte
+    return Number bAND 1 = 0
+end function
+
+function InArray(Needle as uByte, Haystack as uInteger)
+	dim value as uByte
+	for i = 0 to 7
+		value = peek(Haystack + i)
+		if value = Needle
+			return value
+		end if
+	next i
+
+	return 0
+end function
+
+function CheckCollision(X as uByte, Y as uByte, ColidableTilesArray as uInteger) as uByte
+    dim col, lin as uByte
+
+    if IsPair(X) and IsPair(Y)
+        col = X/2
+        lin = Y/2
+
+        return InArray(GetTile(col, lin), ColidableTilesArray) or InArray(GetTile(col + 1, lin), ColidableTilesArray) _
+            or InArray(GetTile(col, lin + 1), ColidableTilesArray) or InArray(GetTile(col + 1, lin + 1), ColidableTilesArray)
+    elseif IsPair(X) and not IsPair(Y)
+        col = X/2
+        lin = (Y - 1)/2
+
+        return InArray(GetTile(col, lin), ColidableTilesArray) or InArray(GetTile(col + 1, lin), ColidableTilesArray) _
+            or InArray(GetTile(col, lin + 1), ColidableTilesArray) or InArray(GetTile(col + 1, lin + 1), ColidableTilesArray) _
+            or InArray(GetTile(col, lin + 2), ColidableTilesArray) or InArray(GetTile(col + 1, lin + 2), ColidableTilesArray)
+	elseif not IsPair(X) and IsPair(Y)
+		col = (X - 1)/2
+		lin = Y/2
+
+		return InArray(GetTile(col, lin), ColidableTilesArray) or InArray(GetTile(col + 1, lin), ColidableTilesArray) or InArray(GetTile(col + 2, lin), ColidableTilesArray) _
+			or InArray(GetTile(col, lin + 1), ColidableTilesArray) or InArray(GetTile(col + 1, lin + 1), ColidableTilesArray) or InArray(GetTile(col + 2, lin + 1), ColidableTilesArray)
+    elseif not IsPair(X) and not IsPair(Y)
+        col = (X - 1)/2
+        lin = (Y - 1)/2
+
+        return InArray(GetTile(col, lin), ColidableTilesArray) or InArray(GetTile(col + 1, lin), ColidableTilesArray) or InArray(GetTile(col + 2, lin), ColidableTilesArray) _
+            or InArray(GetTile(col, lin + 1), ColidableTilesArray) or InArray(GetTile(col + 1, lin + 1), ColidableTilesArray) or InArray(GetTile(col + 2, lin + 1), ColidableTilesArray) _
+            or InArray(GetTile(col, lin + 2), ColidableTilesArray) or InArray(GetTile(col + 1, lin + 2), ColidableTilesArray) or InArray(GetTile(col + 2, lin + 2), ColidableTilesArray)
+    end if
+end function
+
 #endif
