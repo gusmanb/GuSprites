@@ -2048,7 +2048,7 @@ sub PrintString(text as string, Color as uInteger, X as uInteger, Y as uInteger)
     Dim buc as uByte
     Dim tmpVal as uByte = len(text)
 
-    for buc = 1 to tmpVal
+    for buc = 0 to tmpVal - 1
         PrintChar(code(text(buc to buc)), Color, X + buc - 1, Y)
     next buc 
 
