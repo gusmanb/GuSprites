@@ -2048,14 +2048,14 @@ sub PrintString(text as string, Color as uInteger, X as uInteger, Y as uInteger)
     Dim buc as uByte
     Dim tmpVal as uByte = len(text)
 
-    #pragma push(array_base)
-    #pragma array_base = 0
+    #pragma push(string_base)
+    #pragma string_base = 0
 
     for buc = 0 to tmpVal - 1
         PrintChar(code(text(buc to buc)), Color, X + buc - 1, Y)
     next buc
 
-    #pragma pop(array_base)
+    #pragma pop(string_base)
 end sub
 
 sub fastcall PrintChar(CharNumber as uByte, Color as uInteger, X as uInteger, Y as uInteger)

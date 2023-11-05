@@ -1,0 +1,11 @@
+#include "GuSprites.zxbas"
+
+INK 7: PAPER 0: BORDER 0: BRIGHT 0: FLASH 0: CLS
+
+dim text as string = "Hola que tal"
+
+print(text)
+PrintString(text, 7, 10, 20)
+
+WHILE INKEY$<>"":WEND
+WHILE INKEY$="":WEND
